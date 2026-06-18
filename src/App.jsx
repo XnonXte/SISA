@@ -40,8 +40,9 @@ export default function App() {
   const go = (s) => setScreen(s);
 
   const Screen = SCREENS[screen] || Splash;
+
   return (
-    <div style={{ width: 390, minHeight: 844, background: '#FAFAFA', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100vh', background: '#FAFAFA', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <Screen go={go} userData={userData} setUserData={setUserData} />
     </div>
   );

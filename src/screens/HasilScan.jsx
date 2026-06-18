@@ -2,8 +2,8 @@ import React from 'react';
 
 export default function HasilScan({ go, userData }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 844, background: '#FAFAFA' }}>
-      <div className="status-bar"><span>9:41</span><span>●●●</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA' }}>
+      {/* Fake Status bar completely removed */}
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('kamera')}><i className="bi bi-arrow-left" /></button>
         <h2>Validasi AI</h2>
@@ -25,15 +25,14 @@ export default function HasilScan({ go, userData }) {
         {/* Detected badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 20, background: '#E8F5E9', padding: '8px 16px', borderRadius: 20 }}>
           <i className="bi bi-check-circle-fill" style={{ color: '#1DB954', fontSize: 16 }} />
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#1DB954', letterSpacing: 0.3 }}>BOTOL PET BENING</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#2E7D32' }}>VALIDASI BERHASIL</span>
         </div>
 
-        {/* Points */}
         <div style={{ fontSize: 48, fontWeight: 800, color: '#F5A623', marginTop: 16, letterSpacing: -1 }}>
-          +{userData.pickupPoints} POIN
+          +{userData.pickupPoints || 150} POIN
         </div>
         <div style={{ fontSize: 13, color: '#9E9E9E', marginTop: 4 }}>
-          ≈ Rp {(userData.pickupPoints * 10).toLocaleString('id-ID')}
+          ≈ Rp {((userData.pickupPoints || 150) * 10).toLocaleString('id-ID')}
         </div>
 
         {/* Detail card */}
@@ -51,12 +50,9 @@ export default function HasilScan({ go, userData }) {
         </div>
       </div>
 
-      {/* CTAs */}
-      <div style={{ padding: '0 24px 8px' }}>
-        <button className="btn-primary" onClick={() => go('formPickup')}>Request Pickup</button>
-        <button className="btn-secondary" style={{ marginTop: 12 }} onClick={() => go('kamera')}>Scan Lagi</button>
+      <div style={{ padding: 24, background: '#fff', borderTop: '1px solid #E0E0E0' }}>
+        <button className="btn-primary" onClick={() => go('formPickup')}>Jadwalkan Pickup</button>
       </div>
-      <div className="home-indicator" />
     </div>
   );
 }

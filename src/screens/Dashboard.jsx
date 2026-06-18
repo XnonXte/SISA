@@ -19,21 +19,21 @@ export default function Dashboard({ go, userData }) {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 844, background: '#FAFAFA', position: 'relative' }}>
-      <div className="status-bar"><span>9:41</span><span>●●●</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA', position: 'relative' }}>
+      {/* Fake Status bar completely removed */}
 
       {/* Header */}
       <div style={{ width: '100%', padding: '12px 24px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '1px solid #E0E0E0', background: '#fff', flexShrink: 0 }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#9E9E9E', letterSpacing: 1, textTransform: 'uppercase' }}>Selamat datang</div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: '#1A1A1A', marginTop: 2 }}>Hai, {firstName}! 👋</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: '#1A1A1A', marginTop: 2 }}>Hai, {firstName}! <i className="bi bi-hand-index-thumb" style={{ color: '#F5A623' }} /></div>
         </div>
         <div style={{ background: '#FFFCF7', color: '#F5A623', fontSize: 14, fontWeight: 800, border: '1px solid #F5A623', borderRadius: '0px 12px 0px 12px', padding: '6px 14px' }}>
           {points} PT
         </div>
       </div>
 
-      <div className="scroll-content" style={{ padding: '24px 24px 100px' }}>
+      <div className="scroll-content" style={{ flex: 1, padding: '24px 24px 100px', overflowY: 'auto' }}>
         {/* Poin card */}
         <div className="poin-card">
           <div style={{ fontSize: 12, color: '#707070', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Akumulasi Saldo</div>
@@ -51,19 +51,19 @@ export default function Dashboard({ go, userData }) {
           </div>
         </div>
 
-        {/* Shortcuts */}
-        <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+        {/* Action Shortcuts */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 24 }}>
           {shortcuts.map(s => (
-            <div key={s.label} onClick={() => go(s.action)} style={{ flex: 1, background: '#fff', borderRadius: '0px 12px 0px 12px', padding: '14px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid #E0E0E0', cursor: 'pointer', gap: 6, transition: 'background 0.2s' }}>
-              <i className={`bi ${s.icon}`} style={{ fontSize: 24, color: '#1A1A1A' }} />
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#707070', textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.label}</div>
+            <div key={s.label} onClick={() => go(s.action)} style={{ background: '#fff', border: '1px solid #E0E0E0', borderRadius: '0px 16px 0px 16px', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+              <i className={`bi ${s.icon}`} style={{ fontSize: 20, color: '#1DB954' }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1A1A', marginTop: 8, textAlign: 'center' }}>{s.label}</span>
             </div>
           ))}
         </div>
 
-        {/* AI Instruction card */}
-        <div style={{ background: '#fff', borderRadius: '0px 16px 0px 16px', padding: 16, marginTop: 24, border: '1px solid #1DB954', borderLeft: '4px solid #1DB954' }}>
-          <div style={{ fontSize: 12, fontWeight: 800, color: '#1DB954', textTransform: 'uppercase', letterSpacing: 0.5 }}>Instruksi Mutu AI</div>
+        {/* AI Banner Tip */}
+        <div style={{ width: '100%', background: '#E8F5E9', border: '1px solid rgba(29,185,84,0.2)', borderRadius: '16px 0 16px 0', padding: 16, marginTop: 24 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: '#1DB954', letterSpacing: 0.5 }}><i className="bi bi-cpu-fill" style={{ marginRight: 6 }} />PRODUKSI MUTU AI</div>
           <div style={{ fontSize: 13, color: '#1A1A1A', marginTop: 8, lineHeight: 1.4, fontWeight: 500 }}>
             Kosongkan cairan & lepas sedotan dari botol PET sebelum pemindaian untuk hasil validasi optimal.
           </div>
@@ -79,9 +79,9 @@ export default function Dashboard({ go, userData }) {
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px dotted #E0E0E0' }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>{p.name}</div>
-                <div style={{ fontSize: 11, color: '#9E9E9E', marginTop: 4, fontWeight: 600 }}>{p.date}</div>
+                <div style={{ fontSize: 11, color: '#9E9E9E', marginTop: 2 }}>{p.date}</div>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#F5A623' }}>{p.pts}</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#1DB954' }}>{p.pts} PT</div>
             </div>
           ))}
         </div>

@@ -16,20 +16,20 @@ const statusStyle = {
 
 export default function Riwayat({ go }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 844, background: '#FAFAFA', position: 'relative' }}>
-      <div className="status-bar"><span>9:41</span><span>●●●</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA', position: 'relative' }}>
+      {/* Fake Status bar completely removed */}
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('dashboard')}><i className="bi bi-arrow-left" /></button>
         <h2>Log Operasional</h2>
       </div>
 
-      <div className="scroll-content" style={{ padding: '24px 24px 100px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="scroll-content" style={{ flex: 1, padding: '24px 24px 100px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto' }}>
         {items.map((item, i) => {
           const st = statusStyle[item.status];
           const ptColor = item.status === 'DITOLAK' ? '#9E9E9E' : '#F5A623';
           return (
-            <div key={i} style={{ background: '#fff', borderRadius: '0px 16px 0px 16px', padding: 16, display: 'flex', alignItems: 'center', gap: 16, border: '1px solid #E0E0E0', cursor: 'pointer' }}>
-              <div style={{ width: 48, height: 48, background: '#FAFAFA', border: '1px solid #E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div key={i} style={{ background: '#fff', border: '1px solid #E0E0E0', borderRadius: '0px 16px 0px 16px', padding: 14, display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 10, background: '#FAFAFA', border: '1px solid #E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <i className={`bi ${item.icon}`} style={{ fontSize: 22, color: '#1A1A1A', strokeWidth: '1.5' }} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -45,8 +45,8 @@ export default function Riwayat({ go }) {
             </div>
           );
         })}
-        <div style={{ textAlign: 'center', padding: 16, fontSize: 11, fontWeight: 800, color: '#1DB954', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 1 }}>
-          MUAT DATA SEBELUMNYA
+        <div style={{ textAlign: 'center', color: '#9E9E9E', fontSize: 12, fontWeight: 500, marginTop: 12, letterSpacing: 0.5 }}>
+          MENAMPILKAN RIWAYAT 30 HARI TERAKHIR
         </div>
       </div>
 

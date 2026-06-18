@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Kamera({ go }) {
   return (
-    <div style={{ position: 'relative', height: 844, background: '#0A0A0A', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', height: '100vh', background: '#0A0A0A', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Simulated camera background */}
       <div style={{
         position: 'absolute', inset: 0,
@@ -26,23 +26,22 @@ export default function Kamera({ go }) {
           Mendeteksi material kardus atau PET bening...
         </div>
         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 6, textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
-          Posisikan objek di dalam area target
+          Posisikan objek di tengah area pemindaian
         </div>
       </div>
 
-      {/* Scan frame */}
-      <div style={{ flex: 1, position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 260, height: 260, position: 'relative' }}>
-          {/* Corner accents */}
-          {[['top-0 left-0', 'borderTop', 'borderLeft'], ['top-0 right-0', 'borderTop', 'borderRight'], ['bottom-0 left-0', 'borderBottom', 'borderLeft'], ['bottom-0 right-0', 'borderBottom', 'borderRight']].map(([, ,], i) => (
+      {/* Viewport Frame */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32, position: 'relative', zIndex: 5 }}>
+        <div style={{ width: '100%', maxWidth: 300, aspectRatio: '1/1', position: 'relative' }}>
+          {[0, 1, 2, 3].map(i => (
             <div key={i} style={{
-              position: 'absolute',
+              position: 'absolute', borderColor: '#F5A623',
               ...[
                 { top: -2, left: -2, borderTop: '3px solid #F5A623', borderLeft: '3px solid #F5A623', width: 20, height: 20 },
                 { top: -2, right: -2, borderTop: '3px solid #F5A623', borderRight: '3px solid #F5A623', width: 20, height: 20 },
                 { bottom: -2, left: -2, borderBottom: '3px solid #F5A623', borderLeft: '3px solid #F5A623', width: 20, height: 20 },
-                { bottom: -2, right: -2, borderBottom: '3px solid #F5A623', borderRight: '3px solid #F5A623', width: 20, height: 20 },
-              ][i],
+                { bottom: -2, right: -2, borderBottom: '3px solid #F5A623', borderRight: '3px solid #F5A623', width: 20, height: 20 }
+              ][i]
             }} />
           ))}
           <div style={{ width: '100%', height: '100%', border: '2px solid rgba(29,185,84,0.6)', borderRadius: '0px 32px 0px 32px', position: 'relative', overflow: 'hidden' }}>
@@ -55,11 +54,8 @@ export default function Kamera({ go }) {
       <div style={{ position: 'relative', zIndex: 10, paddingBottom: 56, background: 'linear-gradient(to top, rgba(10,10,10,0.95) 0%, transparent 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 40 }}>
         <button
           onClick={() => go('hasilScan')}
-          style={{ width: 72, height: 72, borderRadius: '50%', background: 'transparent', border: '3px solid #fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.15s' }}
-        >
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#1DB954' }} />
-        </button>
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 12 }}>Pilih dari galeri</div>
+          style={{ width: 72, height: 72, borderRadius: '50%', background: '#fff', border: '8px solid rgba(255,255,255,0.3)', cursor: 'pointer', outline: 'none', transition: 'all 0.2s' }}
+        />
       </div>
     </div>
   );

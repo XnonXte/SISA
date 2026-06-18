@@ -6,9 +6,9 @@ export default function Register({ go, userData, setUserData }) {
   const [wallet, setWallet] = useState('GoPay');
 
   const wallets = [
-    { id: 'GoPay', icon: '💚', color: '#00AED6' },
-    { id: 'OVO', icon: '💜', color: '#4C3494' },
-    { id: 'Dana', icon: '💙', color: '#118EEA' },
+    { id: 'GoPay', icon: 'bi bi-wallet2', color: '#00AED6' },
+    { id: 'OVO', icon: 'bi bi-qr-code-scan', color: '#4C3494' },
+    { id: 'Dana', icon: 'bi bi-credit-card-2-front-fill', color: '#118EEA' },
   ];
 
   const handleSubmit = () => {
@@ -18,11 +18,8 @@ export default function Register({ go, userData, setUserData }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 844, background: '#FAFAFA' }}>
-      {/* Status bar */}
-      <div className="status-bar" style={{ background: '#fff' }}>
-        <span>9:41</span><span>●●●</span>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA' }}>
+      {/* Fake Status bar completely removed */}
 
       {/* Top bar */}
       <div style={{ width: '100%', height: 56, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #E0E0E0', flexShrink: 0 }}>
@@ -35,7 +32,7 @@ export default function Register({ go, userData, setUserData }) {
         <input className="input-field" type="text" placeholder="Nama kamu" value={name} onChange={e => setName(e.target.value)} />
 
         <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginTop: 16, marginBottom: 4 }}>Nomor HP</div>
-        <div style={{ display: 'flex', height: 52, borderRadius: 10, border: '1px solid #E0E0E0', background: '#F9FBE7', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', height: 52, borderRadius: 10, border: '1px solid #E0E0E0', background: '#fff', overflow: 'hidden' }}>
           <div style={{ width: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#EEEEEE', borderRight: '1px solid #E0E0E0', fontSize: 14, fontWeight: 700, color: '#1A1A1A', flexShrink: 0 }}>+62</div>
           <input
             type="tel"
@@ -50,21 +47,16 @@ export default function Register({ go, userData, setUserData }) {
         <div style={{ display: 'flex', gap: 8 }}>
           {wallets.map(w => (
             <div key={w.id} className={`chip ${wallet === w.id ? 'active' : ''}`} onClick={() => setWallet(w.id)}>
-              <span>{w.icon}</span> {w.id}
+              <i className={w.icon} style={{ marginRight: 6, color: wallet === w.id ? '#fff' : w.color }} /> {w.id}
             </div>
           ))}
         </div>
       </div>
 
       {/* CTA */}
-      <div style={{ padding: '0 20px 0' }}>
-        <button className="btn-primary" onClick={handleSubmit}>Daftar Sekarang</button>
-        <div style={{ fontSize: 11, color: '#9E9E9E', textAlign: 'center', marginTop: 12 }}>
-          Dengan mendaftar, kamu setuju <span style={{ color: '#1DB954', fontWeight: 600 }}>S&K</span> yang berlaku
-        </div>
+      <div style={{ padding: '20px', background: '#fff', borderTop: '1px solid #E0E0E0' }}>
+        <button className="btn-primary" onClick={handleSubmit}>Daftar</button>
       </div>
-
-      <div className="home-indicator" />
     </div>
   );
 }

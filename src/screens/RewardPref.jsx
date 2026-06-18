@@ -14,8 +14,8 @@ export default function RewardPref({ go, userData, setUserData }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 844, background: '#FAFAFA' }}>
-      <div className="status-bar"><span>9:41</span><span>●●●</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA' }}>
+      {/* Fake Status bar completely removed */}
 
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('register')}>
@@ -24,7 +24,7 @@ export default function RewardPref({ go, userData, setUserData }) {
         <h2>Reward</h2>
       </div>
 
-      <div style={{ flex: 1, padding: '32px 24px 0' }}>
+      <div style={{ flex: 1, padding: '32px 24px 0', overflowY: 'auto' }}>
         <div style={{ fontSize: 28, fontWeight: 800, color: '#1A1A1A', lineHeight: 1.2, letterSpacing: -0.5 }}>
           Tentukan rute konversi saldo.
         </div>
@@ -40,8 +40,7 @@ export default function RewardPref({ go, userData, setUserData }) {
                 key={opt.id}
                 onClick={() => setSelected(opt.id)}
                 style={{
-                  height: 80,
-                  borderRadius: '0px 20px 0px 20px',
+                  height: 80, borderRadius: '0px 20px 0px 20px',
                   border: active ? '2px solid #F5A623' : '1px solid #E0E0E0',
                   background: active ? '#FFFCF7' : '#fff',
                   display: 'flex', alignItems: 'center', padding: '0 16px',
@@ -65,13 +64,9 @@ export default function RewardPref({ go, userData, setUserData }) {
         </div>
       </div>
 
-      <div style={{ padding: '0 24px' }}>
-        <button className="btn-primary" onClick={handleConfirm}>Konfirmasi Rute</button>
-        <div style={{ fontSize: 11, color: '#9E9E9E', textAlign: 'center', marginTop: 14, lineHeight: 1.4 }}>
-          Proses verifikasi mutu & pencairan maks. 1×24 jam operasional.
-        </div>
+      <div style={{ padding: '24px', background: '#fff', borderTop: '1px solid #E0E0E0' }}>
+        <button className="btn-primary" onClick={handleConfirm}>Konfirmasi</button>
       </div>
-      <div className="home-indicator" />
     </div>
   );
 }
