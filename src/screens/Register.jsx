@@ -6,9 +6,9 @@ export default function Register({ go, userData, setUserData }) {
   const [wallet, setWallet] = useState('GoPay');
 
   const wallets = [
-    { id: 'GoPay', icon: 'bi bi-wallet2', color: '#00AED6' },
-    { id: 'OVO', icon: 'bi bi-qr-code-scan', color: '#4C3494' },
-    { id: 'Dana', icon: 'bi bi-credit-card-2-front-fill', color: '#118EEA' },
+    { id: 'GoPay', logoPath: '/gopay.png' },
+    { id: 'OVO', logoPath: '/ovo.png' },
+    { id: 'Dana', logoPath: '/dana.png' },
   ];
 
   const handleSubmit = () => {
@@ -18,20 +18,23 @@ export default function Register({ go, userData, setUserData }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA' }}>
-      {/* Fake Status bar completely removed */}
-
-      {/* Top bar */}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FAFAFA' }}>
+      {/* Fake status bar sudah dihapus total dari sini */}
       <div style={{ width: '100%', height: 56, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #E0E0E0', flexShrink: 0 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>Buat Akun</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#1A1A1A' }}>Pendaftaran Pengguna</h2>
       </div>
 
-      {/* Form */}
-      <div style={{ flex: 1, padding: '0 20px', overflowY: 'auto' }}>
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginTop: 32, marginBottom: 4 }}>Nama Lengkap</div>
-        <input className="input-field" type="text" placeholder="Nama kamu" value={name} onChange={e => setName(e.target.value)} />
+      <div style={{ flex: 1, padding: '32px 24px 0' }}>
+        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginBottom: 4 }}>Nama Lengkap Sesuai ID</div>
+        <input
+          type="text"
+          placeholder="e.g. Budi Setiawan"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          className="input-field"
+        />
 
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginTop: 16, marginBottom: 4 }}>Nomor HP</div>
+        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginTop: 20, marginBottom: 4 }}>Nomor Handphone Aktif</div>
         <div style={{ display: 'flex', height: 52, borderRadius: 10, border: '1px solid #E0E0E0', background: '#fff', overflow: 'hidden' }}>
           <div style={{ width: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#EEEEEE', borderRight: '1px solid #E0E0E0', fontSize: 14, fontWeight: 700, color: '#1A1A1A', flexShrink: 0 }}>+62</div>
           <input
@@ -43,19 +46,31 @@ export default function Register({ go, userData, setUserData }) {
           />
         </div>
 
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginTop: 20, marginBottom: 4 }}>Pilih E-Wallet</div>
+        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginTop: 20, marginBottom: 4 }}>Pilih E-Wallet Utama</div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {wallets.map(w => (
-            <div key={w.id} className={`chip ${wallet === w.id ? 'active' : ''}`} onClick={() => setWallet(w.id)}>
-              <i className={w.icon} style={{ marginRight: 6, color: wallet === w.id ? '#fff' : w.color }} /> {w.id}
-            </div>
-          ))}
+          {wallets.map(w => {
+            const isSelected = wallet === w.id;
+            return (
+              <div
+                key={w.id}
+                className={`chip ${isSelected ? 'active' : ''}`}
+                onClick={() => setWallet(w.id)}
+                style={{ padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
+              >
+                <img
+                  src={w.logoPath}
+                  alt={w.id}
+                  style={{ width: 20, height: 20, objectFit: 'contain' }}
+                />
+                <span style={{ fontSize: 13, fontWeight: 700 }}>{w.id}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* CTA */}
-      <div style={{ padding: '20px', background: '#fff', borderTop: '1px solid #E0E0E0' }}>
-        <button className="btn-primary" onClick={handleSubmit}>Daftar</button>
+      <div style={{ padding: '24px' }}>
+        <button className="btn-primary" onClick={handleSubmit}>Lanjutkan</button>
       </div>
     </div>
   );
