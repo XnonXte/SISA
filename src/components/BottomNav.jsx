@@ -2,10 +2,9 @@ import React from 'react';
 
 const tabs = [
   { id: 'home', label: 'HOME', icon: 'bi-house-fill', screen: 'dashboard' },
-  { id: 'rute', label: 'RUTE', icon: 'bi-map-fill', screen: 'formPickup' },
   { id: 'scan', label: null, icon: 'bi-qr-code-scan', screen: 'kamera' },
-  { id: 'riwayat', label: 'LOG', icon: 'bi-clock-history', screen: 'riwayat' },
-  { id: 'akun', label: 'AKUN', icon: 'bi-person-fill', screen: 'dashboard' },
+  { id: 'riwayat', label: 'RIWAYAT', icon: 'bi-clock-fill', screen: 'riwayat' },
+  { id: 'profil', label: 'PROFIL', icon: 'bi-person-fill', screen: 'profil' },
 ];
 
 export default function BottomNav({ active, go }) {
@@ -14,7 +13,7 @@ export default function BottomNav({ active, go }) {
       {tabs.map(tab => {
         if (tab.id === 'scan') {
           return (
-            <div key="scan" style={{ width: 'auto' }}>
+            <div key="scan" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <button className="nav-scan-btn" onClick={() => go('kamera')}>
                 <i className="bi bi-qr-code-scan" />
               </button>

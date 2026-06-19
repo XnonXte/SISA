@@ -1,6 +1,9 @@
 import React from 'react';
 import BottomNav from '../components/BottomNav';
 
+const MIN_POINTS = 1500; // PRD: minimum penukaran = Rp 15.000, rate 1 poin = Rp 10
+const MIN_RUPIAH = MIN_POINTS * 10;
+
 const methods = [
   { id: 'gopay', label: 'GoPay', logoPath: '/gopay.png' },
   { id: 'ovo', label: 'OVO', logoPath: '/ovo.png' },
@@ -49,12 +52,12 @@ export default function TukarPoin({ go, userData }) {
             <i className="bi bi-info-circle-fill" /> KETENTUAN KHUSUS
           </div>
           <div style={{ fontSize: 12, color: '#707070', lineHeight: 1.5 }}>
-            Minimum batas penukaran instan adalah <span style={{ fontWeight: 700, color: '#1A1A1A' }}>200 Poin</span> per transaksi pencairan.
+            Minimum batas penukaran instan adalah <span style={{ fontWeight: 700, color: '#1A1A1A' }}>{MIN_POINTS.toLocaleString('id-ID')} Poin</span> (≈ Rp {MIN_RUPIAH.toLocaleString('id-ID')}) per transaksi pencairan.
           </div>
         </div>
       </div>
 
-      <BottomNav active="riwayat" go={go} />
+      <BottomNav active="" go={go} />
     </div>
   );
 }

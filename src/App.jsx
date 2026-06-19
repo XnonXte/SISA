@@ -10,6 +10,7 @@ import Dashboard from './screens/Dashboard';
 import Riwayat from './screens/Riwayat';
 import TukarPoin from './screens/TukarPoin';
 import Konfirmasi from './screens/Konfirmasi';
+import Profil from './screens/Profil';
 
 const SCREENS = {
   splash: Splash,
@@ -23,6 +24,7 @@ const SCREENS = {
   riwayat: Riwayat,
   tukarPoin: TukarPoin,
   konfirmasi: Konfirmasi,
+  profil: Profil,
 };
 
 export default function App() {
@@ -31,10 +33,12 @@ export default function App() {
     name: 'Budi Setiawan',
     phone: '',
     wallet: 'GoPay',
+    ewalletAccount: '',
     rewardType: 'ewallet',
     points: 750,
     milestone: 1000,
-    pickupPoints: 150,
+    estimatedPoints: 150,
+    verifiedPoints: null,
   });
 
   const go = (s) => setScreen(s);

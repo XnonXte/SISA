@@ -1,15 +1,33 @@
 import React, { useState } from 'react';
 
+const WALLETS = [
+  { id: 'GoPay', logoPath: '/gopay.png' },
+  { id: 'OVO', logoPath: '/ovo.png' },
+  { id: 'Dana', logoPath: '/dana.png' },
+];
+
 export default function RewardPref({ go, userData, setUserData }) {
   const [selected, setSelected] = useState(userData.rewardType || 'ewallet');
+  const [wallet, setWallet] = useState(userData.wallet || 'GoPay');
+  const [account, setAccount] = useState(userData.ewalletAccount || '');
 
   const options = [
     { id: 'ewallet', title: 'E-Wallet', sub: 'GoPay, OVO, DANA', icon: 'bi bi-wallet2' },
     { id: 'listrik', title: 'Infrastruktur Utilitas', sub: 'Token Meteran Listrik', icon: 'bi bi-lightning-charge' },
   ];
 
+  const isEwallet = selected === 'ewallet';
+  // ONB-03: jika pilih e-wallet, wajib pilih provider + isi nomor akun saat itu juga.
+  const canConfirm = isEwallet ? account.trim().length >= 6 : true;
+
   const handleConfirm = () => {
-    setUserData(u => ({ ...u, rewardType: selected }));
+    if (!canConfirm) return;
+    setUserData(u => ({
+      ...u,
+      rewardType: selected,
+      wallet: isEwallet ? wallet : null,
+      ewalletAccount: isEwallet ? account.trim() : null,
+    }));
     go('dashboard');
   };
 
@@ -21,7 +39,7 @@ export default function RewardPref({ go, userData, setUserData }) {
         <button className="back-btn" onClick={() => go('register')}>
           <i className="bi bi-arrow-left" />
         </button>
-        <h2>Reward</h2>
+        <h2>Setup Reward</h2>
       </div>
 
       <div style={{ flex: 1, padding: '32px 24px 0', overflowY: 'auto' }}>
@@ -62,10 +80,64 @@ export default function RewardPref({ go, userData, setUserData }) {
             );
           })}
         </div>
+
+        {/* Lanjutan form e-wallet — hanya muncul jika kategori "E-Wallet" dipilih (ONB-03) */}
+        {isEwallet && (
+          <div style={{ marginTop: 28, animation: 'fadeIn 0.2s ease' }}>
+            <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
+              Hubungkan Akun E-Wallet
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              {WALLETS.map(w => {
+                const isSelected = wallet === w.id;
+                return (
+                  <div
+                    key={w.id}
+                    className={`chip ${isSelected ? 'active' : ''}`}
+                    onClick={() => setWallet(w.id)}
+                    style={{ padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
+                  >
+                    <img src={w.logoPath} alt={w.id} style={{ width: 20, height: 20, objectFit: 'contain' }} />
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>{w.id}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginBottom: 4 }}>
+              Nomor Akun {wallet}
+            </div>
+            <input
+              type="tel"
+              placeholder="812-3456-7890"
+              value={account}
+              onChange={e => setAccount(e.target.value)}
+              className="input-field"
+            />
+          </div>
+        )}
+
+        {/* Token Listrik: hanya simpan preferensi kategori, detail nomor meter ditandai OQ-1 */}
+        {!isEwallet && (
+          <div style={{ marginTop: 24, background: '#F5F5F5', borderRadius: 12, padding: 14, display: 'flex', gap: 10 }}>
+            <i className="bi bi-info-circle" style={{ color: '#9E9E9E', fontSize: 16, flexShrink: 0, marginTop: 1 }} />
+            <div style={{ fontSize: 12, color: '#707070', lineHeight: 1.5 }}>
+              Detail nomor meter listrik dapat ditambahkan nanti melalui menu pengaturan.
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ padding: '24px', background: '#fff', borderTop: '1px solid #E0E0E0' }}>
-        <button className="btn-primary" onClick={handleConfirm}>Konfirmasi</button>
+        <button
+          className="btn-primary"
+          onClick={handleConfirm}
+          disabled={!canConfirm}
+          style={!canConfirm ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+        >
+          Konfirmasi
+        </button>
       </div>
     </div>
   );

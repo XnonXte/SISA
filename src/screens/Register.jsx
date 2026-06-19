@@ -3,17 +3,10 @@ import React, { useState } from 'react';
 export default function Register({ go, userData, setUserData }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [wallet, setWallet] = useState('GoPay');
-
-  const wallets = [
-    { id: 'GoPay', logoPath: '/gopay.png' },
-    { id: 'OVO', logoPath: '/ovo.png' },
-    { id: 'Dana', logoPath: '/dana.png' },
-  ];
 
   const handleSubmit = () => {
     if (!name.trim()) return;
-    setUserData(u => ({ ...u, name: name.trim() || u.name, phone, wallet }));
+    setUserData(u => ({ ...u, name: name.trim() || u.name, phone }));
     go('rewardPref');
   };
 
@@ -46,26 +39,8 @@ export default function Register({ go, userData, setUserData }) {
           />
         </div>
 
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginTop: 20, marginBottom: 4 }}>Pilih E-Wallet Utama</div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {wallets.map(w => {
-            const isSelected = wallet === w.id;
-            return (
-              <div
-                key={w.id}
-                className={`chip ${isSelected ? 'active' : ''}`}
-                onClick={() => setWallet(w.id)}
-                style={{ padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
-              >
-                <img
-                  src={w.logoPath}
-                  alt={w.id}
-                  style={{ width: 20, height: 20, objectFit: 'contain' }}
-                />
-                <span style={{ fontSize: 13, fontWeight: 700 }}>{w.id}</span>
-              </div>
-            );
-          })}
+        <div style={{ fontSize: 12, color: '#9E9E9E', marginTop: 16, lineHeight: 1.5 }}>
+          Preferensi reward & metode pencairan akan ditentukan di langkah berikutnya.
         </div>
       </div>
 

@@ -1,6 +1,8 @@
 import React from 'react';
 
 export default function HasilScan({ go, userData }) {
+  const estimatedPoints = userData.estimatedPoints ?? 150;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA' }}>
       {/* Fake Status bar completely removed */}
@@ -28,15 +30,24 @@ export default function HasilScan({ go, userData }) {
           <span style={{ fontSize: 13, fontWeight: 700, color: '#2E7D32' }}>VALIDASI BERHASIL</span>
         </div>
 
-        <div style={{ fontSize: 48, fontWeight: 800, color: '#F5A623', marginTop: 16, letterSpacing: -1 }}>
-          +{userData.pickupPoints || 150} POIN
+        {/* Estimasi label */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 20 }}>
+          <i className="bi bi-hourglass-split" style={{ fontSize: 13, color: '#F5A623' }} />
+          <span style={{ fontSize: 12, fontWeight: 800, color: '#F5A623', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+            Estimasi Poin
+          </span>
         </div>
-        <div style={{ fontSize: 13, color: '#9E9E9E', marginTop: 4 }}>
-          ≈ Rp {((userData.pickupPoints || 150) * 10).toLocaleString('id-ID')}
+
+        <div style={{ fontSize: 40, fontWeight: 800, color: '#1A1A1A', marginTop: 8, letterSpacing: -1 }}>
+          ~{estimatedPoints} <span style={{ fontSize: 18, fontWeight: 700, color: '#9E9E9E' }}>Poin</span>
+        </div>
+
+        <div style={{ fontSize: 12, color: '#9E9E9E', marginTop: 6, textAlign: 'center', maxWidth: 300, lineHeight: 1.5 }}>
+          ≈ Rp {(estimatedPoints * 10).toLocaleString('id-ID')} — menunggu verifikasi final saat Mitra melakukan pickup fisik
         </div>
 
         {/* Detail card */}
-        <div style={{ width: '100%', borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0', padding: '16px 0', marginTop: 32 }}>
+        <div style={{ width: '100%', borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0', padding: '16px 0', marginTop: 28 }}>
           {[
             ['Material Dasar', 'Plastik PET (Bening)'],
             ['Grade Mutu', 'Grade A — Bebas Kontaminasi'],

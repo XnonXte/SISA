@@ -5,7 +5,7 @@ const REDEEM_DEST = 'GoPay';
 
 export default function Konfirmasi({ go, userData }) {
   const [showSuccess, setShowSuccess] = useState(false);
-  const remaining = (userData?.points || 500) - REDEEM_PTS;
+  const remaining = Math.max((userData?.points || 500) - REDEEM_PTS, 0);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#F7F9F7', position: 'relative' }}>
@@ -61,6 +61,14 @@ export default function Konfirmasi({ go, userData }) {
             <div style={{ fontSize: 14, color: '#9E9E9E', marginTop: 8 }}>
               Rp {(REDEEM_PTS * 10).toLocaleString('id-ID')} sedang dalam proses ke {REDEEM_DEST}.
             </div>
+
+            {/* Sisa poin — psychological satisfaction moment */}
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px dashed #E0E0E0' }}>
+              <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 600 }}>Sisa Poin Kamu</div>
+              <div style={{ fontSize: 26, fontWeight: 800, color: '#1DB954', marginTop: 2 }}>{remaining} Poin</div>
+              <div style={{ fontSize: 12, color: '#9E9E9E', marginTop: 4 }}>Terus kumpulkan untuk penukaran berikutnya 🌱</div>
+            </div>
+
             <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => go('dashboard')}>Selesai</button>
           </div>
         </div>
