@@ -47,7 +47,8 @@ function EmptyState({ go }) {
   );
 }
 
-export default function Riwayat({ go }) {
+export default function Riwayat({ go, userData }) {
+  const cartItems = userData.cartItems || [];
   const [expandedIdx, setExpandedIdx] = useState(null);
 
   return (
@@ -112,7 +113,7 @@ export default function Riwayat({ go }) {
         </div>
       )}
 
-      <BottomNav active="riwayat" go={go} />
+      <BottomNav active="riwayat" go={go} cartCount={cartItems.length} />
     </div>
   );
 }

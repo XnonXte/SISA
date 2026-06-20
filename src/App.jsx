@@ -11,6 +11,7 @@ import Riwayat from './screens/Riwayat';
 import TukarPoin from './screens/TukarPoin';
 import Konfirmasi from './screens/Konfirmasi';
 import Profil from './screens/Profil';
+import Keranjang from './screens/Keranjang';
 
 const SCREENS = {
   splash: Splash,
@@ -25,6 +26,7 @@ const SCREENS = {
   tukarPoin: TukarPoin,
   konfirmasi: Konfirmasi,
   profil: Profil,
+  keranjang: Keranjang,
 };
 
 export default function App() {
@@ -39,6 +41,8 @@ export default function App() {
     milestone: 1000,
     estimatedPoints: 150,
     verifiedPoints: null,
+    cartItems: [],
+    pickupDraft: null,
   });
 
   const go = (s) => setScreen(s);

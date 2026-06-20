@@ -11,6 +11,7 @@ const maskAccount = (acc) => {
 export default function Profil({ go, userData }) {
   const { name, phone, wallet, rewardType, ewalletAccount, points } = userData;
 
+  const cartItems = userData.cartItems || [];
   const isEwallet = rewardType !== 'listrik';
   const rewardIcon = isEwallet ? 'bi-wallet2' : 'bi-lightning-charge';
   const rewardTitle = isEwallet ? (wallet || 'E-Wallet') : 'Token Listrik';
@@ -100,7 +101,7 @@ export default function Profil({ go, userData }) {
         </button>
       </div>
 
-      <BottomNav active="profil" go={go} />
+      <BottomNav active="profil" go={go} cartCount={cartItems.length} />
     </div>
   );
 }

@@ -7,6 +7,9 @@ export default function Dashboard({ go, userData }) {
   const progress = Math.min((points / milestone) * 100, 100);
   const remaining = milestone - points;
 
+  const cartItems = userData.cartItems || [];
+  const cartTotal = cartItems.reduce((sum, item) => sum + item.estimatedPoints, 0);
+
   const shortcuts = [
     { label: 'Scan Sampah', icon: 'bi-qr-code-scan', action: 'kamera' },
     { label: 'Tukar Poin', icon: 'bi-arrow-left-right', action: 'tukarPoin' },
@@ -28,8 +31,25 @@ export default function Dashboard({ go, userData }) {
           <div style={{ fontSize: 11, fontWeight: 700, color: '#9E9E9E', letterSpacing: 1, textTransform: 'uppercase' }}>Selamat datang</div>
           <div style={{ fontSize: 18, fontWeight: 800, color: '#1A1A1A', marginTop: 2 }}>Hai, {firstName}! <i className="bi bi-hand-index-thumb" style={{ color: '#F5A623' }} /></div>
         </div>
-        <div style={{ background: '#FFFCF7', color: '#F5A623', fontSize: 14, fontWeight: 800, border: '1px solid #F5A623', borderRadius: '0px 12px 0px 12px', padding: '6px 14px' }}>
-          {points} PT
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Ikon Keranjang + badge jumlah item — akses cepat ke Screen Keranjang */}
+          <div onClick={() => go('keranjang')} style={{ position: 'relative', cursor: 'pointer', padding: 4 }}>
+            <i className="bi bi-basket2" style={{ fontSize: 22, color: '#1A1A1A' }} />
+            {cartItems.length > 0 && (
+              <span style={{
+                position: 'absolute', top: -2, right: -2, background: '#F5A623', color: '#fff',
+                fontSize: 10, fontWeight: 800, width: 16, height: 16, borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1,
+              }}>
+                {cartItems.length}
+              </span>
+            )}
+          </div>
+
+          <div style={{ background: '#FFFCF7', color: '#F5A623', fontSize: 14, fontWeight: 800, border: '1px solid #F5A623', borderRadius: '0px 12px 0px 12px', padding: '6px 14px' }}>
+            {points} PT
+          </div>
         </div>
       </div>
 
@@ -50,6 +70,30 @@ export default function Dashboard({ go, userData }) {
             </div>
           </div>
         </div>
+
+        {/* Kartu ringkasan Keranjang — hanya tampil kalau ada item tertunda */}
+        {cartItems.length > 0 && (
+          <div
+            onClick={() => go('keranjang')}
+            style={{
+              background: '#FFFCF7', border: '1px solid #F5A623', borderRadius: '0px 16px 0px 16px',
+              padding: 16, display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', marginTop: 20,
+            }}
+          >
+            <div style={{ width: 44, height: 44, borderRadius: 10, background: '#FFF8E1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <i className="bi bi-basket2" style={{ fontSize: 22, color: '#F5A623' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#1A1A1A' }}>
+                {cartItems.length} Item di Keranjang
+              </div>
+              <div style={{ fontSize: 12, color: '#707070', marginTop: 2 }}>
+                Total ~{cartTotal} Poin menunggu pickup
+              </div>
+            </div>
+            <i className="bi bi-chevron-right" style={{ fontSize: 16, color: '#9E9E9E' }} />
+          </div>
+        )}
 
         {/* Action Shortcuts */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 24 }}>
@@ -87,7 +131,7 @@ export default function Dashboard({ go, userData }) {
         </div>
       </div>
 
-      <BottomNav active="home" go={go} />
+     <BottomNav active="home" go={go} cartCount={cartItems.length} />
     </div>
   );
 }

@@ -1,18 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function HasilScan({ go, userData }) {
+export default function HasilScan({ go, userData, setUserData }) {
   const estimatedPoints = userData.estimatedPoints ?? 150;
+  const [showToast, setShowToast] = useState(false);
+
+  const wasteItem = {
+    id: `item_${Date.now()}`,
+    category: userData.scannedCategory || 'Plastik PET (Bening)',
+    icon: userData.scannedCategory?.includes('Kardus') ? 'bi-box-seam' : 'bi-recycle',
+    estimatedPoints,
+    daysInCart: 0,
+  };
+
+  const handleAddToCart = () => {
+    setUserData(u => ({
+      ...u,
+      cartItems: [...(u.cartItems || []), wasteItem],
+    }));
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+      go('kamera');
+    }, 1400);
+  };
+
+  const handleDirectPickup = () => {
+    setUserData(u => ({
+      ...u,
+      pickupDraft: { source: 'direct', items: [wasteItem] },
+    }));
+    go('formPickup');
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA' }}>
-      {/* Fake Status bar completely removed */}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA', position: 'relative' }}>
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('kamera')}><i className="bi bi-arrow-left" /></button>
         <h2>Validasi AI</h2>
       </div>
 
       <div style={{ flex: 1, padding: '0 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 16, overflowY: 'auto' }}>
-        {/* Photo preview */}
         <div style={{
           width: '100%', height: 220,
           borderRadius: '0px 24px 0px 24px',
@@ -24,13 +51,11 @@ export default function HasilScan({ go, userData }) {
           </div>
         </div>
 
-        {/* Detected badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 20, background: '#E8F5E9', padding: '8px 16px', borderRadius: 20 }}>
           <i className="bi bi-check-circle-fill" style={{ color: '#1DB954', fontSize: 16 }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: '#2E7D32' }}>VALIDASI BERHASIL</span>
         </div>
 
-        {/* Estimasi label */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 20 }}>
           <i className="bi bi-hourglass-split" style={{ fontSize: 13, color: '#F5A623' }} />
           <span style={{ fontSize: 12, fontWeight: 800, color: '#F5A623', letterSpacing: 0.5, textTransform: 'uppercase' }}>
@@ -46,10 +71,9 @@ export default function HasilScan({ go, userData }) {
           ≈ Rp {(estimatedPoints * 10).toLocaleString('id-ID')} — menunggu verifikasi final saat Mitra melakukan pickup fisik
         </div>
 
-        {/* Detail card */}
         <div style={{ width: '100%', borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0', padding: '16px 0', marginTop: 28 }}>
           {[
-            ['Material Dasar', 'Plastik PET (Bening)'],
+            ['Material Dasar', wasteItem.category],
             ['Grade Mutu', 'Grade A — Bebas Kontaminasi'],
             ['Instruksi', 'Siapkan botol di depan pintu saat pickup.'],
           ].map(([label, val]) => (
@@ -61,9 +85,24 @@ export default function HasilScan({ go, userData }) {
         </div>
       </div>
 
-      <div style={{ padding: 24, background: '#fff', borderTop: '1px solid #E0E0E0' }}>
-        <button className="btn-primary" onClick={() => go('formPickup')}>Jadwalkan Pickup</button>
+      <div style={{ padding: '16px 24px 24px', background: '#fff', borderTop: '1px solid #E0E0E0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <button className="btn-primary" onClick={handleDirectPickup}>Request Pickup Langsung</button>
+        <button className="btn-secondary" onClick={handleAddToCart}>
+          <i className="bi bi-basket2" style={{ marginRight: 8 }} />Tambah ke Keranjang
+        </button>
       </div>
+
+      {showToast && (
+        <div style={{
+          position: 'absolute', bottom: 110, left: '50%', transform: 'translateX(-50%)',
+          background: '#1A1A2E', color: '#fff', fontSize: 13, fontWeight: 600,
+          padding: '12px 20px', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 8,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)', whiteSpace: 'nowrap', zIndex: 100,
+        }}>
+          <i className="bi bi-check-circle-fill" style={{ color: '#1DB954' }} />
+          Item ditambahkan ke Keranjang
+        </div>
+      )}
     </div>
   );
 }
