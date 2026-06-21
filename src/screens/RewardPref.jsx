@@ -96,10 +96,16 @@ export default function RewardPref({ go, userData, setUserData }) {
                     key={w.id}
                     className={`chip ${isSelected ? 'active' : ''}`}
                     onClick={() => setWallet(w.id)}
-                    style={{ padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
+                    style={{
+                      padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center',
+                      flex: 1, height: 40, borderRadius: 20,
+                      border: isSelected ? '1.5px solid #1DB954' : '1.5px solid #EEEEEE',
+                      background: isSelected ? '#E8F5E9' : '#EEEEEE',
+                      cursor: 'pointer', transition: 'all 0.2s',
+                    }}
                   >
                     <img src={w.logoPath} alt={w.id} style={{ width: 20, height: 20, objectFit: 'contain' }} />
-                    <span style={{ fontSize: 13, fontWeight: 700 }}>{w.id}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? '#1DB954' : '#9E9E9E' }}>{w.id}</span>
                   </div>
                 );
               })}
