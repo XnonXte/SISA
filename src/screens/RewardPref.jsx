@@ -13,6 +13,7 @@ export default function RewardPref() {
   const { go } = useAppNavigation();
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
+  const token = userData.token;
 
   const [selected, setSelected] = useState(userData.rewardType || 'ewallet');
   const [wallet, setWallet] = useState(userData.wallet || 'GoPay');
@@ -39,7 +40,7 @@ export default function RewardPref() {
   return (
     <div className="flex flex-col h-screen bg-surface">
       <div className="top-app-bar">
-        <button className="back-btn" onClick={() => go('register')}>
+        <button className="back-btn" onClick={() => go(token ? 'profil' : 'register')}>
           <i className="bi bi-arrow-left" />
         </button>
         <h2>Setup Reward</h2>
