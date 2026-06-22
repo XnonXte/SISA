@@ -3,19 +3,27 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useAppNavigation } from '../app/useAppNavigation';
 import { redeemPoints } from '../features/user/userSlice';
 
-const REDEEM_PTS = 250;
+const REDEEM_PTS = 1500; // Disesuaikan dengan MIN_POINTS dari halaman sebelumnya
 const REDEEM_DEST = 'GoPay';
 
 export default function Konfirmasi() {
   const { go } = useAppNavigation();
   const dispatch = useDispatch();
-  const points = useSelector((state) => state.user.points);
+  const points = useSelector((state) => state.user.points) || 0;
+
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showFailed, setShowFailed] = useState(false); // State baru untuk pop up gagal
+
   const remaining = Math.max(points - REDEEM_PTS, 0);
 
   const handleConfirmRedeem = () => {
-    dispatch(redeemPoints(REDEEM_PTS));
-    setShowSuccess(true);
+    // Validasi akhir sebelum hit ke Redux/API
+    if (points < REDEEM_PTS) {
+      setShowFailed(true);
+    } else {
+      dispatch(redeemPoints(REDEEM_PTS));
+      setShowSuccess(true);
+    }
   };
 
   return (
@@ -87,6 +95,25 @@ export default function Konfirmasi() {
             </div>
 
             <button className="btn-primary mt-6" onClick={() => go('dashboard')}>Selesai</button>
+          </div>
+        </div>
+      )}
+
+      {/* Failed overlay */}
+      {showFailed && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-2xl p-8 w-80 text-center animate-pop-in">
+            <div className="mb-4">
+              <i className="bi bi-exclamation-circle-fill text-red-500" style={{ fontSize: 56 }} />
+            </div>
+            <div className="text-[22px] font-extrabold text-ink">Penukaran Gagal</div>
+            <div className="text-sm text-placeholder mt-2">
+              Saldo Poin Anda saat ini (<span className="font-bold text-ink">{points} PT</span>) tidak mencukupi untuk melakukan penukaran sebesar {REDEEM_PTS} Poin.
+            </div>
+
+            <button className="btn-primary mt-6 w-full bg-red-500 hover:bg-red-600 border-none" onClick={() => go('tukarPoin')}>
+              Kembali
+            </button>
           </div>
         </div>
       )}

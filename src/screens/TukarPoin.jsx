@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // Tambahkan useState
 import { useSelector } from 'react-redux';
 import { useAppNavigation } from '../app/useAppNavigation';
 import BottomNav from '../components/BottomNav';
@@ -16,6 +16,18 @@ const methods = [
 export default function TukarPoin() {
   const { go } = useAppNavigation();
   const points = useSelector((state) => state.user.points) || 0;
+
+  // State untuk kontrol pop-up gagal
+  const [showErrorModal, setShowErrorModal] = useState(false);
+
+  // Fungsi validasi klik metode
+  const handleMethodClick = () => {
+    if (points < MIN_POINTS) {
+      setShowErrorModal(true);
+    } else {
+      go('konfirmasi');
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-surface relative">
@@ -40,7 +52,7 @@ export default function TukarPoin() {
         {methods.map((m) => (
           <div
             key={m.id}
-            onClick={() => go('konfirmasi')}
+            onClick={handleMethodClick} // Diubah dari go('konfirmasi') ke fungsi validasi
             className="bg-white border border-line rounded-geo-flip h-[68px] px-4 flex items-center gap-4 cursor-pointer mb-3"
           >
             <div className="w-10 h-10 flex items-center justify-center shrink-0">
@@ -64,6 +76,28 @@ export default function TukarPoin() {
       </div>
 
       <BottomNav active="" />
+
+      {/* Pop-up Gagal (Saldo Kurang) */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-2xl p-8 w-80 text-center animate-pop-in mx-4">
+            <div className="mb-4">
+              <i className="bi bi-x-circle-fill text-red-500" style={{ fontSize: 56 }} />
+            </div>
+            <div className="text-[20px] font-extrabold text-ink">Poin Tidak Cukup</div>
+            <div className="text-sm text-placeholder mt-2">
+              Maaf, kamu butuh minimal <span className="font-bold text-ink">{MIN_POINTS.toLocaleString('id-ID')} Poin</span> untuk melakukan penukaran.
+            </div>
+
+            <button
+              className="btn-primary mt-6 w-full bg-red-500 hover:bg-red-600 border-none"
+              onClick={() => setShowErrorModal(false)}
+            >
+              Saya Mengerti
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
