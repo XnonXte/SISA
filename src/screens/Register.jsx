@@ -2,16 +2,36 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAppNavigation } from '../app/useAppNavigation';
 import { setProfile } from '../features/user/userSlice';
+import { apiRegister } from '../services/api';
+import { loginSuccess } from '../features/user/userSlice';
 
 export default function Register() {
   const { go } = useAppNavigation();
   const dispatch = useDispatch();
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = () => {
-    if (!name.trim()) return;
-    dispatch(setProfile({ name, phone }));
+  const canSubmit = name.trim().length > 0 && phone.trim().length > 0 && !loading;
+
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+    setError(null);
+    setLoading(true);
+
+    const { data, error: apiError } = await apiRegister({ name: name.trim(), phone });
+
+    setLoading(false);
+
+    if (apiError || !data) {
+      setError(apiError ?? 'Pendaftaran gagal. Coba lagi.');
+      return;
+    }
+    dispatch(loginSuccess(data));
+    // loginSuccess persists token + profile to Redux (store.js syncs to localStorage)
+    dispatch(setProfile({ name: data.name ?? name.trim(), phone: data.phone ?? phone }));
     go('rewardPref');
   };
 
@@ -25,10 +45,11 @@ export default function Register() {
         <div className="text-xs text-placeholder font-medium mb-1">Nama Lengkap Sesuai ID</div>
         <input
           type="text"
-          placeholder="e.g. Budi Setiawan"
+          placeholder="Nama lengkap"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="input-field"
+          disabled={loading}
         />
 
         <div className="text-xs text-placeholder font-medium mt-5 mb-1">Nomor Handphone Aktif</div>
@@ -42,8 +63,16 @@ export default function Register() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="flex-1 border-none bg-transparent px-3.5 font-sans text-[15px] text-ink outline-none"
+            disabled={loading}
           />
         </div>
+
+        {error && (
+          <div className="mt-4 text-xs text-danger font-semibold flex items-center gap-1.5">
+            <i className="bi bi-exclamation-circle-fill" />
+            {error}
+          </div>
+        )}
 
         <div className="text-xs text-placeholder mt-4 leading-relaxed">
           Preferensi reward & metode pencairan akan ditentukan di langkah berikutnya.
@@ -51,7 +80,15 @@ export default function Register() {
       </div>
 
       <div className="p-6">
-        <button className="btn-primary" onClick={handleSubmit}>Lanjutkan</button>
+        <button
+          className="btn-primary"
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+        >
+          {loading
+            ? <><i className="bi bi-arrow-repeat animate-spin mr-2" />Mendaftar...</>
+            : 'Lanjutkan'}
+        </button>
       </div>
     </div>
   );

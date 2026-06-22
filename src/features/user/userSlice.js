@@ -1,17 +1,29 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit';
 
-const initialState = {
-  name: 'Budi Setiawan',
+// Clean blank slate — no demo data. All values populated after login/register.
+export const initialState = {
+  // Auth
+  userId: null,
+  token: null,
+
+  // Profile
+  name: '',
   phone: '',
-  wallet: 'GoPay',
+  wallet: null,
   ewalletAccount: '',
-  rewardType: 'ewallet', // 'ewallet' | 'listrik'
-  points: 750,
+  rewardType: null, // 'ewallet' | 'listrik'
+
+  // Points
+  points: 0,
   milestone: 1000,
-  estimatedPoints: 150,
-  scannedCategory: null,
-  verifiedPoints: null,
+
+  // Scan session — set by Kamera, consumed by HasilScan
+  scanResult: null, // { imageBase64, category, estimatedPoints, confidence, grade, instruction }
+
+  // Cart
   cartItems: [], // { id, category, icon, estimatedPoints, daysInCart }
+
+  // Pickup
   pickupDraft: null, // { source: 'cart' | 'direct', items: [...] }
 };
 
@@ -19,11 +31,25 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    // Called after successful login API response
+    loginSuccess: (state, action) => {
+      const { userId, token, name, phone, wallet, ewalletAccount, rewardType, points, milestone } = action.payload;
+      state.userId = userId;
+      state.token = token;
+      state.name = name ?? '';
+      state.phone = phone ?? '';
+      state.wallet = wallet ?? null;
+      state.ewalletAccount = ewalletAccount ?? '';
+      state.rewardType = rewardType ?? null;
+      state.points = points ?? 0;
+      state.milestone = milestone ?? 1000;
+    },
+
     // Register.jsx — handleSubmit
     setProfile: (state, action) => {
       const { name, phone } = action.payload;
-      if (name && name.trim()) state.name = name.trim();
-      state.phone = phone;
+      if (name?.trim()) state.name = name.trim();
+      if (phone) state.phone = phone;
     },
 
     // RewardPref.jsx — handleConfirm
@@ -34,14 +60,17 @@ const userSlice = createSlice({
       state.ewalletAccount = rewardType === 'ewallet' ? ewalletAccount : null;
     },
 
-    // Kamera.jsx → HasilScan.jsx — store the simulated AI scan result
+    // Kamera.jsx — stores the full API scan response for HasilScan to read
     setScanResult: (state, action) => {
-      const { estimatedPoints, scannedCategory } = action.payload;
-      if (estimatedPoints != null) state.estimatedPoints = estimatedPoints;
-      if (scannedCategory) state.scannedCategory = scannedCategory;
+      // action.payload = { imageBase64, category, estimatedPoints, confidence, grade, instruction }
+      state.scanResult = action.payload;
     },
 
-    // HasilScan.jsx — handleAddToCart
+    clearScanResult: (state) => {
+      state.scanResult = null;
+    },
+
+    // HasilScan.jsx — addToCart
     addToCart: {
       reducer: (state, action) => {
         state.cartItems.push(action.payload);
@@ -57,13 +86,13 @@ const userSlice = createSlice({
       }),
     },
 
-    // Keranjang.jsx — remove items once they're pulled into a pickup draft
+    // Keranjang.jsx — after requesting pickup for selected items
     removeFromCart: (state, action) => {
-      const ids = action.payload; // array of item ids
+      const ids = action.payload; // string[]
       state.cartItems = state.cartItems.filter((item) => !ids.includes(item.id));
     },
 
-    // HasilScan.jsx (direct) & Keranjang.jsx (from cart) — both build a pickupDraft
+    // HasilScan.jsx / Keranjang.jsx — stage items for FormPickup
     setPickupDraft: (state, action) => {
       state.pickupDraft = action.payload; // { source, items }
     },
@@ -72,29 +101,34 @@ const userSlice = createSlice({
       state.pickupDraft = null;
     },
 
-    // Konfirmasi.jsx — handleRedeem (Tukar Sekarang)
+    // Konfirmasi.jsx — Tukar Sekarang
     redeemPoints: (state, action) => {
-      const amount = action.payload;
-      state.points = Math.max(state.points - amount, 0);
+      state.points = Math.max(state.points - action.payload, 0);
     },
 
-    // Generic credit, e.g. when a tracked pickup completes and points land
+    // Credited when a pickup completes on the backend
     addPoints: (state, action) => {
       state.points += action.payload;
     },
+
+    // Logout — wipe everything back to blank slate
+    logout: () => initialState,
   },
 });
 
 export const {
+  loginSuccess,
   setProfile,
   setRewardPref,
   setScanResult,
+  clearScanResult,
   addToCart,
   removeFromCart,
   setPickupDraft,
   clearPickupDraft,
   redeemPoints,
   addPoints,
+  logout,
 } = userSlice.actions;
 
 export default userSlice.reducer;

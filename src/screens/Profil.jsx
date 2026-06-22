@@ -1,6 +1,8 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAppNavigation } from '../app/useAppNavigation';
+import { logout } from '../features/user/userSlice';
+import { apiLogout } from '../services/api';
 import BottomNav from '../components/BottomNav';
 
 const maskAccount = (acc) => {
@@ -11,9 +13,11 @@ const maskAccount = (acc) => {
 };
 
 export default function Profil() {
-  const { go, reset } = useAppNavigation();
+  const { reset } = useAppNavigation();
+  const { go } = useAppNavigation();
+  const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
-  const { name, phone, wallet, rewardType, ewalletAccount, points } = userData;
+  const { name, phone, wallet, rewardType, ewalletAccount, points, token } = userData;
 
   const isEwallet = rewardType !== 'listrik';
   const rewardIcon = isEwallet ? 'bi-wallet2' : 'bi-lightning-charge';
@@ -29,14 +33,21 @@ export default function Profil() {
     { label: 'Tentang SISA', icon: 'bi-info-circle', action: null },
   ];
 
-  const handleLogout = () => {
-    reset(); // clears navigation history and returns to splash
+  const handleLogout = async () => {
+    // Best-effort server-side logout — don't block UI on failure
+    if (token) apiLogout(token).catch(() => {});
+    // logout action resets Redux state to initialState (all empty)
+    // store.js subscriber sees token === null and calls clearSession()
+    dispatch(logout());
+    reset();
   };
 
   return (
     <div className="flex flex-col h-screen bg-surface relative">
       <div className="top-app-bar">
-        <button className="back-btn" onClick={() => go('dashboard')}><i className="bi bi-arrow-left" /></button>
+        <button className="back-btn" onClick={() => go('dashboard')}>
+          <i className="bi bi-arrow-left" />
+        </button>
         <h2>Profil</h2>
       </div>
 
@@ -47,9 +58,9 @@ export default function Profil() {
             <i className="bi bi-person-fill text-white text-3xl" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg font-extrabold text-ink truncate">{name || 'Pengguna SISA'}</div>
+            <div className="text-lg font-extrabold text-ink truncate">{name}</div>
             <div className="text-[13px] text-muted mt-0.5 font-semibold">
-              {phone ? `+62 ${phone}` : 'Nomor HP belum diatur'}
+              {phone ? `+62 ${phone}` : ''}
             </div>
           </div>
         </div>
@@ -68,7 +79,7 @@ export default function Profil() {
           className="bg-white border border-line rounded-geo-flip p-3.5 flex items-center gap-3.5 mb-6 cursor-pointer"
           onClick={() => go('rewardPref')}
         >
-          <div className="w-11 h-11 rounded-lg bg-surface-card flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 rounded-lg bg-[#F4F4F4] flex items-center justify-center shrink-0">
             <i className={`bi ${rewardIcon} text-xl text-ink`} />
           </div>
           <div className="flex-1 min-w-0">
@@ -87,7 +98,9 @@ export default function Profil() {
             <div
               key={item.label}
               onClick={item.action || undefined}
-              className={`flex items-center gap-3.5 px-4 py-3.5 ${i < menuItems.length - 1 ? 'border-b border-[#F0F0F0]' : ''} ${item.action ? 'cursor-pointer' : ''}`}
+              className={`flex items-center gap-3.5 px-4 py-3.5
+                ${i < menuItems.length - 1 ? 'border-b border-[#F0F0F0]' : ''}
+                ${item.action ? 'cursor-pointer' : ''}`}
             >
               <i className={`bi ${item.icon} text-lg text-ink w-5`} />
               <span className="flex-1 text-sm font-semibold text-ink">{item.label}</span>
