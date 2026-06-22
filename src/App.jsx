@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSelector } from 'react-redux';
+
 import Splash from './screens/Splash';
 import Register from './screens/Register';
 import RewardPref from './screens/RewardPref';
@@ -30,28 +32,12 @@ const SCREENS = {
 };
 
 export default function App() {
-  const [screen, setScreen] = useState('splash');
-  const [userData, setUserData] = useState({
-    name: 'Budi Setiawan',
-    phone: '',
-    wallet: 'GoPay',
-    ewalletAccount: '',
-    rewardType: 'ewallet',
-    points: 750,
-    milestone: 1000,
-    estimatedPoints: 150,
-    verifiedPoints: null,
-    cartItems: [],
-    pickupDraft: null,
-  });
-
-  const go = (s) => setScreen(s);
-
+  const screen = useSelector((state) => state.navigation.current);
   const Screen = SCREENS[screen] || Splash;
 
   return (
-    <div style={{ width: '100%', height: '100vh', background: '#FAFAFA', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Screen go={go} userData={userData} setUserData={setUserData} />
+    <div className="w-full h-screen bg-surface flex flex-col overflow-hidden">
+      <Screen />
     </div>
   );
 }

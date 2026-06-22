@@ -1,4 +1,6 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { useAppNavigation } from '../app/useAppNavigation';
 import BottomNav from '../components/BottomNav';
 
 const MIN_POINTS = 1500; // PRD: minimum penukaran = Rp 15.000, rate 1 poin = Rp 10
@@ -11,25 +13,27 @@ const methods = [
   { id: 'pln', label: 'Token Listrik', logoPath: '/pln.png' },
 ];
 
-export default function TukarPoin({ go, userData }) {
-  const points = userData?.points || 0;
+export default function TukarPoin() {
+  const { go } = useAppNavigation();
+  const points = useSelector((state) => state.user.points) || 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FAFAFA', position: 'relative' }}>
-      {/* Fake status bar sudah dihapus total dari sini */}
+    <div className="flex flex-col h-full bg-surface relative">
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('dashboard')}><i className="bi bi-arrow-left" /></button>
         <h2>Tukar Poin</h2>
       </div>
 
-      <div className="scroll-content" style={{ padding: '24px 24px 100px' }}>
-        <div className="poin-card" style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: 12, color: '#707070', fontWeight: 700, textTransform: 'uppercase' }}>Saldo Tersedia</div>
-          <div style={{ fontSize: 36, fontWeight: 800, color: '#1A1A1A', marginTop: 4 }}>{points} PT</div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#9E9E9E', marginTop: 4 }}>ESTIMASI NILAI: IDR {(points * 10).toLocaleString('id-ID')}</div>
+      <div className="scroll-content px-6 pt-6 pb-[100px]">
+        <div className="poin-card mb-7">
+          <div className="text-xs text-muted font-bold uppercase">Saldo Tersedia</div>
+          <div className="text-[36px] font-extrabold text-ink mt-1">{points} PT</div>
+          <div className="text-[13px] font-semibold text-placeholder mt-1">
+            ESTIMASI NILAI: IDR {(points * 10).toLocaleString('id-ID')}
+          </div>
         </div>
 
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 700, textTransform: 'uppercase', marginBottom: 14, letterSpacing: 0.5 }}>
+        <div className="text-xs text-placeholder font-bold uppercase mb-3.5 tracking-wide">
           Pilih Metode Penarikan
         </div>
 
@@ -37,27 +41,29 @@ export default function TukarPoin({ go, userData }) {
           <div
             key={m.id}
             onClick={() => go('konfirmasi')}
-            style={{ background: '#fff', border: '1px solid #E0E0E0', borderRadius: '0px 16px 0px 16px', height: 68, padding: '0 16px', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer', marginBottom: 12 }}
+            className="bg-white border border-line rounded-geo-flip h-[68px] px-4 flex items-center gap-4 cursor-pointer mb-3"
           >
-            <div style={{ width: 52, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <img src={m.logoPath} alt={m.label} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
+              <img src={m.logoPath} alt={m.label} className="w-8 h-8 object-contain" />
             </div>
-            <div style={{ flex: 1, fontSize: 14, fontWeight: 800, color: '#1A1A1A', textTransform: 'uppercase' }}>{m.label}</div>
-            <i className="bi bi-chevron-right" style={{ fontSize: 16, color: '#9E9E9E' }} />
+            <div className="flex-1 text-sm font-extrabold text-ink uppercase">{m.label}</div>
+            <i className="bi bi-chevron-right text-base text-placeholder" />
           </div>
         ))}
 
-        <div style={{ background: '#fff', borderRadius: '0px 12px 0px 12px', padding: 16, marginTop: 8, border: '1px solid #1DB954', borderLeft: '4px solid #1DB954', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: '#1DB954', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div className="bg-white rounded-geo-sm p-4 mt-2 border border-primary border-l-4 border-l-primary flex flex-col gap-1.5">
+          <div className="text-[11px] font-extrabold text-primary flex items-center gap-1.5">
             <i className="bi bi-info-circle-fill" /> KETENTUAN KHUSUS
           </div>
-          <div style={{ fontSize: 12, color: '#707070', lineHeight: 1.5 }}>
-            Minimum batas penukaran instan adalah <span style={{ fontWeight: 700, color: '#1A1A1A' }}>{MIN_POINTS.toLocaleString('id-ID')} Poin</span> (≈ Rp {MIN_RUPIAH.toLocaleString('id-ID')}) per transaksi pencairan.
+          <div className="text-xs text-muted leading-relaxed">
+            Minimum batas penukaran instan adalah{' '}
+            <span className="font-bold text-ink">{MIN_POINTS.toLocaleString('id-ID')} Poin</span>{' '}
+            (≈ Rp {MIN_RUPIAH.toLocaleString('id-ID')}) per transaksi pencairan.
           </div>
         </div>
       </div>
 
-      <BottomNav active="" go={go} />
+      <BottomNav active="" />
     </div>
   );
 }

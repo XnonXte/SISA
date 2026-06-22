@@ -1,50 +1,56 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useAppNavigation } from '../app/useAppNavigation';
+import { setProfile } from '../features/user/userSlice';
 
-export default function Register({ go, userData, setUserData }) {
+export default function Register() {
+  const { go } = useAppNavigation();
+  const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
   const handleSubmit = () => {
     if (!name.trim()) return;
-    setUserData(u => ({ ...u, name: name.trim() || u.name, phone }));
+    dispatch(setProfile({ name, phone }));
     go('rewardPref');
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FAFAFA' }}>
-      {/* Fake status bar sudah dihapus total dari sini */}
-      <div style={{ width: '100%', height: 56, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #E0E0E0', flexShrink: 0 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#1A1A1A' }}>Pendaftaran Pengguna</h2>
+    <div className="flex flex-col h-full bg-surface">
+      <div className="w-full h-14 bg-white flex items-center justify-center border-b border-line shrink-0">
+        <h2 className="text-lg font-extrabold text-ink">Pendaftaran Pengguna</h2>
       </div>
 
-      <div style={{ flex: 1, padding: '32px 24px 0' }}>
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginBottom: 4 }}>Nama Lengkap Sesuai ID</div>
+      <div className="flex-1 px-6 pt-8">
+        <div className="text-xs text-placeholder font-medium mb-1">Nama Lengkap Sesuai ID</div>
         <input
           type="text"
           placeholder="e.g. Budi Setiawan"
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           className="input-field"
         />
 
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginTop: 20, marginBottom: 4 }}>Nomor Handphone Aktif</div>
-        <div style={{ display: 'flex', height: 52, borderRadius: 10, border: '1px solid #E0E0E0', background: '#fff', overflow: 'hidden' }}>
-          <div style={{ width: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#EEEEEE', borderRight: '1px solid #E0E0E0', fontSize: 14, fontWeight: 700, color: '#1A1A1A', flexShrink: 0 }}>+62</div>
+        <div className="text-xs text-placeholder font-medium mt-5 mb-1">Nomor Handphone Aktif</div>
+        <div className="flex h-[52px] rounded-[10px] border border-line bg-white overflow-hidden">
+          <div className="w-14 flex items-center justify-center bg-[#EEEEEE] border-r border-line text-sm font-bold text-ink shrink-0">
+            +62
+          </div>
           <input
             type="tel"
             placeholder="812-3456-7890"
             value={phone}
-            onChange={e => setPhone(e.target.value)}
-            style={{ flex: 1, border: 'none', background: 'transparent', padding: '0 14px', fontFamily: 'inherit', fontSize: 15, color: '#1A1A1A', outline: 'none' }}
+            onChange={(e) => setPhone(e.target.value)}
+            className="flex-1 border-none bg-transparent px-3.5 font-sans text-[15px] text-ink outline-none"
           />
         </div>
 
-        <div style={{ fontSize: 12, color: '#9E9E9E', marginTop: 16, lineHeight: 1.5 }}>
+        <div className="text-xs text-placeholder mt-4 leading-relaxed">
           Preferensi reward & metode pencairan akan ditentukan di langkah berikutnya.
         </div>
       </div>
 
-      <div style={{ padding: '24px' }}>
+      <div className="p-6">
         <button className="btn-primary" onClick={handleSubmit}>Lanjutkan</button>
       </div>
     </div>

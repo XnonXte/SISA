@@ -1,79 +1,82 @@
 import React from 'react';
+import { useAppNavigation } from '../app/useAppNavigation';
 
-export default function Tracking({ go, userData }) {
+export default function Tracking() {
+  const { go } = useAppNavigation();
+
   const steps = [
-    { label: 'Dikonfirmasi', icon: <i className="bi bi-check-lg" />, state: 'done' },
-    { label: 'Dijemput', icon: <i className="bi bi-truck" />, state: 'active' },
-    { label: 'Ditimbang', icon: <i className="bi bi-speedometer" />, state: 'pending' },
-    { label: 'Poin Masuk', icon: <i className="bi bi-cash-coin" />, state: 'pending' },
+    { label: 'Dikonfirmasi', icon: 'bi-check-lg', state: 'done' },
+    { label: 'Dijemput', icon: 'bi-truck', state: 'active' },
+    { label: 'Ditimbang', icon: 'bi-speedometer', state: 'pending' },
+    { label: 'Poin Masuk', icon: 'bi-cash-coin', state: 'pending' },
   ];
 
+  const dotClass = {
+    done: 'bg-primary text-white',
+    active: 'bg-accent-tint2 border border-accent text-[12px]',
+    pending: 'bg-[#F5F5F5] text-placeholder text-[12px]',
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#F7F9F7' }}>
-      {/* Fake Status bar completely removed */}
-      <div style={{ width: '100%', height: 56, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #F0F0F0', flexShrink: 0 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1DB954' }}>Pickup Dikonfirmasi <i className="bi bi-check-circle-fill" /></h2>
+    <div className="flex flex-col h-screen bg-surface-alt">
+      <div className="w-full h-14 bg-white flex items-center justify-center border-b border-[#F0F0F0] shrink-0">
+        <h2 className="text-lg font-bold text-primary">
+          Pickup Dikonfirmasi <i className="bi bi-check-circle-fill" />
+        </h2>
       </div>
 
-      <div style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
+      <div className="flex-1 px-5 flex flex-col items-center overflow-y-auto">
         {/* Mitra illustration */}
-        <div style={{ width: '100%', height: 200, marginTop: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <div style={{ width: 180, height: 180, borderRadius: '50%', background: 'linear-gradient(135deg, #E8F5E9, #F1F8E9)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            <div className="mitra-anim">
-              <i className="bi bi-truck" style={{ fontSize: 64, color: '#1DB954' }} />
+        <div className="w-full h-[200px] mt-8 flex items-center justify-center shrink-0">
+          <div className="w-[180px] h-[180px] rounded-full bg-gradient-to-br from-primary-tint to-[#F1F8E9] flex items-center justify-center relative">
+            <div className="animate-drive">
+              <i className="bi bi-truck text-primary" style={{ fontSize: 64 }} />
             </div>
-            <div style={{ position: 'absolute', bottom: 20, left: -30, display: 'flex', gap: 6 }}>
-              <div className="dot-1" style={{ width: 8, height: 8, borderRadius: '50%', background: '#1DB954' }} />
-              <div className="dot-2" style={{ width: 8, height: 8, borderRadius: '50%', background: '#1DB954' }} />
-              <div className="dot-3" style={{ width: 8, height: 8, borderRadius: '50%', background: '#1DB954' }} />
+            <div className="absolute bottom-5 -left-7 flex gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-primary animate-dot-fade [animation-delay:0s]" />
+              <div className="w-2 h-2 rounded-full bg-primary animate-dot-fade [animation-delay:0.3s]" />
+              <div className="w-2 h-2 rounded-full bg-primary animate-dot-fade [animation-delay:0.6s]" />
             </div>
-            <div className="ping-anim" style={{ position: 'absolute', top: 10, right: -5, width: 32, height: 32, borderRadius: '50%', background: '#1DB954', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="bi bi-geo-alt-fill" style={{ color: '#fff', fontSize: 14 }} />
+            <div className="absolute top-2.5 -right-1 w-8 h-8 rounded-full bg-primary flex items-center justify-center animate-ping-brand">
+              <i className="bi bi-geo-alt-fill text-white text-sm" />
             </div>
           </div>
         </div>
 
-        <div style={{ fontSize: 20, fontWeight: 700, color: '#1A1A1A', textAlign: 'center', marginTop: 24, lineHeight: 1.3 }}>
+        <div className="text-xl font-bold text-ink text-center mt-6 leading-snug">
           Mitra pengepul sedang<br />menuju lokasi
         </div>
-        <div style={{ fontSize: 14, color: '#9E9E9E', textAlign: 'center', marginTop: 8 }}>
+        <div className="text-sm text-placeholder text-center mt-2">
           Estimasi tiba: 15–20 menit
         </div>
 
         {/* Progress Tracker Horizontal */}
-        <div style={{ display: 'flex', width: '100%', alignItems: 'center', marginTop: 40, padding: '0 8px' }}>
+        <div className="flex w-full items-center mt-10 px-2">
           {steps.map((step, i) => (
             <React.Fragment key={step.label}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: 64 }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: step.state === 'done' ? '#1DB954' : step.state === 'active' ? '#FFF8E1' : '#F5F5F5',
-                  border: step.state === 'active' ? '1px solid #F5A623' : 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14,
-                  color: step.state === 'done' ? '#fff' : '#9E9E9E',
-                }}>
-                  {step.icon}
+              <div className="flex flex-col items-center gap-1.5 w-16">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${dotClass[step.state]}`}>
+                  <i className={`bi ${step.icon}`} />
                 </div>
-                <div style={{ fontSize: 10, color: '#9E9E9E', textAlign: 'center' }}>{step.label}</div>
+                <div className="text-[10px] text-placeholder text-center">{step.label}</div>
               </div>
               {i < steps.length - 1 && (
-                <div style={{ flex: 1, height: 2, background: i === 0 ? '#1DB954' : '#E0E0E0', marginBottom: 20 }} />
+                <div className={`flex-1 h-0.5 mb-5 ${i === 0 ? 'bg-primary' : 'bg-line'}`} />
               )}
             </React.Fragment>
           ))}
         </div>
 
         {/* Info box */}
-        <div style={{ width: '100%', background: '#E8F5E9', borderRadius: 12, padding: '12px 14px', marginTop: 20, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-          <i className="bi bi-lightbulb-fill" style={{ color: '#1DB954', fontSize: 18, flexShrink: 0, marginTop: 2 }} />
-          <div style={{ fontSize: 13, color: '#2E7D32', lineHeight: 1.5 }}>
+        <div className="w-full bg-primary-tint rounded-xl p-3.5 mt-5 flex items-start gap-2.5">
+          <i className="bi bi-lightbulb-fill text-primary text-lg shrink-0 mt-0.5" />
+          <div className="text-[13px] text-[#2E7D32] leading-relaxed">
             Siapkan sampah di depan pintu. Mitra akan langsung mengambil tanpa perlu masuk ke dalam rumah.
           </div>
         </div>
       </div>
 
-      <div style={{ padding: 20, background: '#fff', borderTop: '1px solid #E0E0E0' }}>
+      <div className="p-5 bg-white border-t border-line">
         <button className="btn-primary" onClick={() => go('dashboard')}>Selesai</button>
       </div>
     </div>

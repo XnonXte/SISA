@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAppNavigation } from '../app/useAppNavigation';
+import { setRewardPref } from '../features/user/userSlice';
 
 const WALLETS = [
   { id: 'GoPay', logoPath: '/gopay.png' },
@@ -6,7 +9,11 @@ const WALLETS = [
   { id: 'Dana', logoPath: '/dana.png' },
 ];
 
-export default function RewardPref({ go, userData, setUserData }) {
+export default function RewardPref() {
+  const { go } = useAppNavigation();
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.user);
+
   const [selected, setSelected] = useState(userData.rewardType || 'ewallet');
   const [wallet, setWallet] = useState(userData.wallet || 'GoPay');
   const [account, setAccount] = useState(userData.ewalletAccount || '');
@@ -17,13 +24,11 @@ export default function RewardPref({ go, userData, setUserData }) {
   ];
 
   const isEwallet = selected === 'ewallet';
-  // ONB-03: jika pilih e-wallet, wajib pilih provider + isi nomor akun saat itu juga.
   const canConfirm = isEwallet ? account.trim().length >= 6 : true;
 
   const handleConfirm = () => {
     if (!canConfirm) return;
-    setUserData(u => ({
-      ...u,
+    dispatch(setRewardPref({
       rewardType: selected,
       wallet: isEwallet ? wallet : null,
       ewalletAccount: isEwallet ? account.trim() : null,
@@ -32,9 +37,7 @@ export default function RewardPref({ go, userData, setUserData }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA' }}>
-      {/* Fake Status bar completely removed */}
-
+    <div className="flex flex-col h-screen bg-surface">
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('register')}>
           <i className="bi bi-arrow-left" />
@@ -42,38 +45,30 @@ export default function RewardPref({ go, userData, setUserData }) {
         <h2>Setup Reward</h2>
       </div>
 
-      <div style={{ flex: 1, padding: '32px 24px 0', overflowY: 'auto' }}>
-        <div style={{ fontSize: 28, fontWeight: 800, color: '#1A1A1A', lineHeight: 1.2, letterSpacing: -0.5 }}>
-          Tentukan rute konversi saldo.
-        </div>
-        <div style={{ fontSize: 14, color: '#707070', marginTop: 8 }}>
+      <div className="flex-1 px-6 pt-8 overflow-y-auto">
+        <div className="text-h1 text-ink">Tentukan rute konversi saldo.</div>
+        <div className="text-sm text-muted mt-2">
           Parameter ini dapat diubah melalui menu pengaturan.
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 40 }}>
-          {options.map(opt => {
+        <div className="flex flex-col gap-4 mt-10">
+          {options.map((opt) => {
             const active = selected === opt.id;
             return (
               <div
                 key={opt.id}
                 onClick={() => setSelected(opt.id)}
-                style={{
-                  height: 80, borderRadius: '0px 20px 0px 20px',
-                  border: active ? '2px solid #F5A623' : '1px solid #E0E0E0',
-                  background: active ? '#FFFCF7' : '#fff',
-                  display: 'flex', alignItems: 'center', padding: '0 16px',
-                  cursor: 'pointer', transition: 'all 0.2s',
-                  gap: 16,
-                }}
+                className={`h-20 rounded-geo-lg flex items-center px-4 gap-4 cursor-pointer transition-all
+                  ${active ? 'border-2 border-accent bg-accent-tint' : 'border border-line bg-white'}`}
               >
-                <div style={{ width: 44, height: 44, background: active ? '#FFF8E1' : '#F0F0F0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 ${active ? 'bg-accent-tint2' : 'bg-surface-card'}`}>
                   <i className={opt.icon} style={{ fontSize: 22, color: active ? '#F5A623' : '#1A1A1A' }} />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>{opt.title}</div>
-                  <div style={{ fontSize: 13, color: '#707070', marginTop: 3 }}>{opt.sub}</div>
+                <div className="flex-1">
+                  <div className="text-[15px] font-bold text-ink">{opt.title}</div>
+                  <div className="text-[13px] text-muted mt-0.5">{opt.sub}</div>
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: active ? '#F5A623' : '#E0E0E0', letterSpacing: 0.5 }}>
+                <div className={`text-[11px] font-bold tracking-wide ${active ? 'text-accent' : 'text-line'}`}>
                   {active ? 'AKTIF' : 'PILIH'}
                 </div>
               </div>
@@ -81,67 +76,51 @@ export default function RewardPref({ go, userData, setUserData }) {
           })}
         </div>
 
-        {/* Lanjutan form e-wallet — hanya muncul jika kategori "E-Wallet" dipilih (ONB-03) */}
         {isEwallet && (
-          <div style={{ marginTop: 28, animation: 'fadeIn 0.2s ease' }}>
-            <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
+          <div className="mt-7">
+            <div className="text-xs text-placeholder font-bold uppercase tracking-wide mb-3">
               Hubungkan Akun E-Wallet
             </div>
 
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-              {WALLETS.map(w => {
+            <div className="flex gap-2 mb-4">
+              {WALLETS.map((w) => {
                 const isSelected = wallet === w.id;
                 return (
                   <div
                     key={w.id}
-                    className={`chip ${isSelected ? 'active' : ''}`}
                     onClick={() => setWallet(w.id)}
-                    style={{
-                      padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center',
-                      flex: 1, height: 40, borderRadius: 20,
-                      border: isSelected ? '1.5px solid #1DB954' : '1.5px solid #EEEEEE',
-                      background: isSelected ? '#E8F5E9' : '#EEEEEE',
-                      cursor: 'pointer', transition: 'all 0.2s',
-                    }}
+                    className={`chip flex-1 ${isSelected ? 'active' : ''}`}
                   >
-                    <img src={w.logoPath} alt={w.id} style={{ width: 20, height: 20, objectFit: 'contain' }} />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? '#1DB954' : '#9E9E9E' }}>{w.id}</span>
+                    <img src={w.logoPath} alt={w.id} className="w-5 h-5 object-contain" />
+                    <span className="text-[13px] font-bold">{w.id}</span>
                   </div>
                 );
               })}
             </div>
 
-            <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 500, marginBottom: 4 }}>
-              Nomor Akun {wallet}
-            </div>
+            <div className="text-xs text-placeholder font-medium mb-1">Nomor Akun {wallet}</div>
             <input
               type="tel"
               placeholder="812-3456-7890"
               value={account}
-              onChange={e => setAccount(e.target.value)}
+              onChange={(e) => setAccount(e.target.value)}
               className="input-field"
             />
           </div>
         )}
 
-        {/* Token Listrik: hanya simpan preferensi kategori, detail nomor meter ditandai OQ-1 */}
         {!isEwallet && (
-          <div style={{ marginTop: 24, background: '#F5F5F5', borderRadius: 12, padding: 14, display: 'flex', gap: 10 }}>
-            <i className="bi bi-info-circle" style={{ color: '#9E9E9E', fontSize: 16, flexShrink: 0, marginTop: 1 }} />
-            <div style={{ fontSize: 12, color: '#707070', lineHeight: 1.5 }}>
+          <div className="mt-6 bg-surface-card rounded-xl p-3.5 flex gap-2.5">
+            <i className="bi bi-info-circle text-placeholder text-base shrink-0 mt-0.5" />
+            <div className="text-xs text-muted leading-relaxed">
               Detail nomor meter listrik dapat ditambahkan nanti melalui menu pengaturan.
             </div>
           </div>
         )}
       </div>
 
-      <div style={{ padding: '24px', background: '#fff', borderTop: '1px solid #E0E0E0' }}>
-        <button
-          className="btn-primary"
-          onClick={handleConfirm}
-          disabled={!canConfirm}
-          style={!canConfirm ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
-        >
+      <div className="p-6 bg-white border-t border-line">
+        <button className="btn-primary" onClick={handleConfirm} disabled={!canConfirm}>
           Konfirmasi
         </button>
       </div>

@@ -1,4 +1,6 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { useAppNavigation } from '../app/useAppNavigation';
 import BottomNav from '../components/BottomNav';
 
 const maskAccount = (acc) => {
@@ -8,10 +10,11 @@ const maskAccount = (acc) => {
   return `${digits.slice(0, 4)}••••${digits.slice(-3)}`;
 };
 
-export default function Profil({ go, userData }) {
+export default function Profil() {
+  const { go, reset } = useAppNavigation();
+  const userData = useSelector((state) => state.user);
   const { name, phone, wallet, rewardType, ewalletAccount, points } = userData;
 
-  const cartItems = userData.cartItems || [];
   const isEwallet = rewardType !== 'listrik';
   const rewardIcon = isEwallet ? 'bi-wallet2' : 'bi-lightning-charge';
   const rewardTitle = isEwallet ? (wallet || 'E-Wallet') : 'Token Listrik';
@@ -26,82 +29,79 @@ export default function Profil({ go, userData }) {
     { label: 'Tentang SISA', icon: 'bi-info-circle', action: null },
   ];
 
+  const handleLogout = () => {
+    reset(); // clears navigation history and returns to splash
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA', position: 'relative' }}>
-      {/* Fake status bar tidak digunakan */}
+    <div className="flex flex-col h-screen bg-surface relative">
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('dashboard')}><i className="bi bi-arrow-left" /></button>
         <h2>Profil</h2>
       </div>
 
-      <div className="scroll-content" style={{ flex: 1, padding: '24px 24px 100px', overflowY: 'auto' }}>
+      <div className="scroll-content px-6 pt-6 pb-[100px]">
         {/* Identity card */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
-          <div style={{ width: 64, height: 64, borderRadius: '0px 18px 0px 18px', background: '#1A1A2E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <i className="bi bi-person-fill" style={{ fontSize: 30, color: '#fff' }} />
+        <div className="flex items-center gap-4 mb-7">
+          <div className="w-16 h-16 rounded-geo-flip bg-ink-soft flex items-center justify-center shrink-0">
+            <i className="bi bi-person-fill text-white text-3xl" />
           </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#1A1A1A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {name || 'Pengguna SISA'}
-            </div>
-            <div style={{ fontSize: 13, color: '#707070', marginTop: 2, fontWeight: 600 }}>
+          <div className="min-w-0">
+            <div className="text-lg font-extrabold text-ink truncate">{name || 'Pengguna SISA'}</div>
+            <div className="text-[13px] text-muted mt-0.5 font-semibold">
               {phone ? `+62 ${phone}` : 'Nomor HP belum diatur'}
             </div>
           </div>
         </div>
 
         {/* Points summary */}
-        <div className="poin-card" style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 12, color: '#707070', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Total Poin Terkumpul</div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#1A1A1A', marginTop: 4 }}>{points} PT</div>
+        <div className="poin-card mb-6">
+          <div className="text-xs text-muted font-bold tracking-wide uppercase">Total Poin Terkumpul</div>
+          <div className="text-[32px] font-extrabold text-ink mt-1">{points} PT</div>
         </div>
 
         {/* Reward preference */}
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12, letterSpacing: 0.5 }}>
+        <div className="text-xs text-placeholder font-bold uppercase mb-3 tracking-wide">
           Metode Pencairan
         </div>
         <div
-          style={{ background: '#fff', border: '1px solid #E0E0E0', borderRadius: '0px 16px 0px 16px', padding: 14, display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, cursor: 'pointer' }}
+          className="bg-white border border-line rounded-geo-flip p-3.5 flex items-center gap-3.5 mb-6 cursor-pointer"
           onClick={() => go('rewardPref')}
         >
-          <div style={{ width: 44, height: 44, borderRadius: 8, background: '#F0F0F0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <i className={`bi ${rewardIcon}`} style={{ fontSize: 20, color: '#1A1A1A' }} />
+          <div className="w-11 h-11 rounded-lg bg-surface-card flex items-center justify-center shrink-0">
+            <i className={`bi ${rewardIcon} text-xl text-ink`} />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: '#1A1A1A' }}>{rewardTitle}</div>
-            <div style={{ fontSize: 12, color: '#707070', marginTop: 2 }}>{rewardSub}</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-extrabold text-ink">{rewardTitle}</div>
+            <div className="text-xs text-muted mt-0.5">{rewardSub}</div>
           </div>
-          <span style={{ fontSize: 11, fontWeight: 800, color: '#1DB954', letterSpacing: 0.5 }}>UBAH</span>
+          <span className="text-[11px] font-extrabold text-primary tracking-wide">UBAH</span>
         </div>
 
         {/* Menu list */}
-        <div style={{ fontSize: 12, color: '#9E9E9E', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12, letterSpacing: 0.5 }}>
+        <div className="text-xs text-placeholder font-bold uppercase mb-3 tracking-wide">
           Lainnya
         </div>
-        <div style={{ background: '#fff', border: '1px solid #E0E0E0', borderRadius: '0px 16px 0px 16px', overflow: 'hidden', marginBottom: 24 }}>
+        <div className="bg-white border border-line rounded-geo-flip overflow-hidden mb-6">
           {menuItems.map((item, i) => (
             <div
               key={item.label}
               onClick={item.action || undefined}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
-                borderBottom: i < menuItems.length - 1 ? '1px solid #F0F0F0' : 'none',
-                cursor: item.action ? 'pointer' : 'default',
-              }}
+              className={`flex items-center gap-3.5 px-4 py-3.5 ${i < menuItems.length - 1 ? 'border-b border-[#F0F0F0]' : ''} ${item.action ? 'cursor-pointer' : ''}`}
             >
-              <i className={`bi ${item.icon}`} style={{ fontSize: 18, color: '#1A1A1A', width: 20 }} />
-              <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{item.label}</span>
-              <i className="bi bi-chevron-right" style={{ fontSize: 14, color: '#9E9E9E' }} />
+              <i className={`bi ${item.icon} text-lg text-ink w-5`} />
+              <span className="flex-1 text-sm font-semibold text-ink">{item.label}</span>
+              <i className="bi bi-chevron-right text-sm text-placeholder" />
             </div>
           ))}
         </div>
 
-        <button className="btn-secondary" onClick={() => go('splash')}>
-          <i className="bi bi-box-arrow-right" style={{ marginRight: 8 }} /> Keluar
+        <button className="btn-secondary" onClick={handleLogout}>
+          <i className="bi bi-box-arrow-right mr-2" /> Keluar
         </button>
       </div>
 
-      <BottomNav active="profil" go={go} cartCount={cartItems.length} />
+      <BottomNav active="profil" />
     </div>
   );
 }

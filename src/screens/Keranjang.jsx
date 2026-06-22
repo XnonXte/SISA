@@ -1,35 +1,36 @@
 import React, { useState, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAppNavigation } from '../app/useAppNavigation';
+import { setPickupDraft, removeFromCart } from '../features/user/userSlice';
 import BottomNav from '../components/BottomNav';
 
-export default function Keranjang({ go, userData, setUserData }) {
-  const cartItems = userData.cartItems || [];
+export default function Keranjang() {
+  const { go } = useAppNavigation();
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.user.cartItems) || [];
+
   const [checked, setChecked] = useState(() => {
-    // Default: semua item tercentang saat screen dibuka (sesuai brief "1 item otomatis tercentang", diperluas ke semua saat awal)
     const init = {};
-    cartItems.forEach(item => { init[item.id] = true; });
+    cartItems.forEach((item) => { init[item.id] = true; });
     return init;
   });
 
   const toggleItem = (id) => {
-    // Kalau cuma 1 item di keranjang, checkbox dikunci tercentang — tidak bisa di-uncheck
     if (cartItems.length === 1) return;
-    setChecked(prev => ({ ...prev, [id]: !prev[id] }));
+    setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const selectedItems = useMemo(
-    () => cartItems.filter(item => checked[item.id]),
+    () => cartItems.filter((item) => checked[item.id]),
     [cartItems, checked]
   );
   const totalPoints = selectedItems.reduce((sum, item) => sum + item.estimatedPoints, 0);
   const canRequest = selectedItems.length > 0;
 
   const handleRequestPickup = () => {
-    // Item yang tidak dicentang tetap in_cart — hanya selectedItems yang dibawa ke Form Pickup
-    setUserData(u => ({
-      ...u,
-      pickupDraft: { source: 'cart', items: selectedItems },
-      cartItems: (u.cartItems || []).filter(item => !checked[item.id]),
-    }));
+    const selectedIds = selectedItems.map((item) => item.id);
+    dispatch(setPickupDraft({ source: 'cart', items: selectedItems }));
+    dispatch(removeFromCart(selectedIds));
     go('formPickup');
   };
 
@@ -39,29 +40,29 @@ export default function Keranjang({ go, userData, setUserData }) {
     return `Disimpan ${daysAgo} hari lalu`;
   };
 
-  const isUrgent = (daysAgo) => daysAgo >= 11; // mendekati batas 14 hari, sinyal visual saja — bukan status baru
+  const isUrgent = (daysAgo) => daysAgo >= 11;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#FAFAFA', position: 'relative' }}>
+    <div className="flex flex-col h-screen bg-surface relative">
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('dashboard')}><i className="bi bi-arrow-left" /></button>
         <h2>Keranjang Sampah</h2>
       </div>
 
       {cartItems.length === 0 ? (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 32px' }}>
-          <i className="bi bi-basket2" style={{ fontSize: 56, color: '#BDBDBD' }} />
-          <div style={{ fontSize: 16, fontWeight: 800, color: '#1A1A1A', marginTop: 16 }}>Keranjang Kamu Masih Kosong</div>
-          <div style={{ fontSize: 13, color: '#9E9E9E', marginTop: 6, lineHeight: 1.5 }}>
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-8">
+          <i className="bi bi-basket2 text-[56px] text-[#BDBDBD]" />
+          <div className="text-base font-extrabold text-ink mt-4">Keranjang Kamu Masih Kosong</div>
+          <div className="text-[13px] text-placeholder mt-1.5 leading-relaxed">
             Mulai scan sampah pertamamu!
           </div>
-          <button className="btn-primary" style={{ marginTop: 24, width: 'auto', padding: '0 24px' }} onClick={() => go('kamera')}>
+          <button className="btn-primary mt-6 w-auto px-6" onClick={() => go('kamera')}>
             Scan Sekarang
           </button>
         </div>
       ) : (
         <>
-          <div className="scroll-content" style={{ flex: 1, padding: '20px 24px 140px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto' }}>
+          <div className="scroll-content px-6 pt-5 pb-[172px] flex flex-col gap-3">
             {cartItems.map((item) => {
               const isChecked = !!checked[item.id];
               const locked = cartItems.length === 1;
@@ -70,32 +71,28 @@ export default function Keranjang({ go, userData, setUserData }) {
               return (
                 <div
                   key={item.id}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 14, padding: 14,
-                    background: '#fff', border: isChecked ? '1.5px solid #1DB954' : '1px solid #E0E0E0',
-                    borderRadius: '0px 16px 0px 16px',
-                  }}
+                  className={`flex items-center gap-3.5 p-3.5 bg-white rounded-geo-flip
+                    ${isChecked ? 'border-[1.5px] border-primary' : 'border border-line'}`}
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggleItem(item.id)}
                     disabled={locked}
-                    style={{ width: 20, height: 20, flexShrink: 0, accentColor: '#1DB954', cursor: locked ? 'default' : 'pointer' }}
+                    className="w-5 h-5 shrink-0 accent-primary"
+                    style={{ cursor: locked ? 'default' : 'pointer' }}
                   />
-                  <div style={{ width: 44, height: 44, borderRadius: 10, background: '#FAFAFA', border: '1px solid #E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <i className={`bi ${item.icon}`} style={{ fontSize: 22, color: '#1A1A1A' }} />
+                  <div className="w-11 h-11 rounded-[10px] bg-surface border border-line flex items-center justify-center shrink-0">
+                    <i className={`bi ${item.icon} text-xl text-ink`} />
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#1A1A1A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {item.category}
-                    </div>
-                    <div style={{ fontSize: 11, color: urgent ? '#F5A623' : '#9E9E9E', marginTop: 4, fontWeight: 600 }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-extrabold text-ink truncate">{item.category}</div>
+                    <div className={`text-[11px] mt-1 font-semibold ${urgent ? 'text-accent' : 'text-placeholder'}`}>
                       {formatUsia(item.daysInCart)}
                       {urgent && ' · segera ajukan pickup'}
                     </div>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: '#F5A623', flexShrink: 0 }}>
+                  <div className="text-sm font-extrabold text-accent shrink-0">
                     +{item.estimatedPoints} Poin
                   </div>
                 </div>
@@ -103,26 +100,21 @@ export default function Keranjang({ go, userData, setUserData }) {
             })}
           </div>
 
-          <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', padding: '16px 24px 24px', background: '#fff', borderTop: '1px solid #E0E0E0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
-              <span style={{ fontSize: 13, color: '#707070', fontWeight: 600 }}>
+          <div className="absolute bottom-[72px] left-0 w-full px-6 pt-4 pb-6 bg-white border-t border-line">
+            <div className="flex justify-between items-baseline mb-3">
+              <span className="text-[13px] text-muted font-semibold">
                 Total estimasi ({selectedItems.length} item dipilih)
               </span>
-              <span style={{ fontSize: 20, fontWeight: 800, color: '#1A1A1A' }}>~{totalPoints} Poin</span>
+              <span className="text-xl font-extrabold text-ink">~{totalPoints} Poin</span>
             </div>
-            <button
-              className="btn-primary"
-              onClick={handleRequestPickup}
-              disabled={!canRequest}
-              style={!canRequest ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
-            >
+            <button className="btn-primary" onClick={handleRequestPickup} disabled={!canRequest}>
               Request Pickup untuk Item Terpilih
             </button>
           </div>
         </>
       )}
 
-      <BottomNav active="keranjang" go={go} cartCount={cartItems.length} />
+      <BottomNav active="keranjang" />
     </div>
   );
 }

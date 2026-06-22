@@ -1,60 +1,73 @@
 import React from 'react';
+import { useAppNavigation } from '../app/useAppNavigation';
 
-export default function Kamera({ go }) {
+export default function Kamera() {
+  const { go } = useAppNavigation();
+
   return (
-    <div style={{ position: 'relative', height: '100vh', background: '#0A0A0A', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div className="relative h-screen bg-[#0A0A0A] flex flex-col overflow-hidden">
       {/* Simulated camera background */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(rgba(10,10,10,0.45), rgba(10,10,10,0.45)), url("https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=600") center/cover no-repeat',
-      }} />
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.04, background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.08) 2px, rgba(255,255,255,0.08) 4px)' }} />
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(10,10,10,0.45), rgba(10,10,10,0.45)), url("https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=600")',
+        }}
+      />
+      <div
+        className="absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.08) 2px, rgba(255,255,255,0.08) 4px)',
+        }}
+      />
 
       {/* Top overlay */}
-      <div style={{ position: 'relative', zIndex: 10, width: '100%', height: 80, background: 'linear-gradient(to bottom, rgba(10,10,10,0.85) 0%, transparent 100%)', display: 'flex', alignItems: 'center', padding: '0 24px', justifyContent: 'space-between' }}>
-        <button onClick={() => go('dashboard')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', fontFamily: 'inherit', fontSize: 11, fontWeight: 700, letterSpacing: 1, padding: '8px 16px', borderRadius: '0px 8px 0px 8px', cursor: 'pointer', backdropFilter: 'blur(4px)' }}>
+      <div className="relative z-10 w-full h-20 flex items-center px-6 justify-between"
+           style={{ background: 'linear-gradient(to bottom, rgba(10,10,10,0.85) 0%, transparent 100%)' }}>
+        <button
+          onClick={() => go('dashboard')}
+          className="bg-transparent border border-white/25 text-white font-sans text-[11px] font-bold tracking-wide
+                     px-4 py-2 rounded-geo-xs cursor-pointer backdrop-blur-sm"
+        >
           BATAL
         </button>
-        <button style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', fontFamily: 'inherit', fontSize: 11, fontWeight: 700, letterSpacing: 1, padding: '8px 16px', borderRadius: '0px 8px 0px 8px', cursor: 'pointer', backdropFilter: 'blur(4px)' }}>
+        <button className="bg-transparent border border-white/25 text-white font-sans text-[11px] font-bold tracking-wide
+                            px-4 py-2 rounded-geo-xs cursor-pointer backdrop-blur-sm">
           <i className="bi bi-lightning" />
         </button>
       </div>
 
       {/* Instruction */}
-      <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', marginTop: 16 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#1DB954', letterSpacing: 0.5, textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+      <div className="relative z-10 text-center mt-4">
+        <div className="text-sm font-bold text-primary tracking-wide" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
           Mendeteksi material kardus atau PET bening...
         </div>
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 6, textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+        <div className="text-xs text-white/80 mt-1.5" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
           Posisikan objek di tengah area pemindaian
         </div>
       </div>
 
       {/* Viewport Frame */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32, position: 'relative', zIndex: 5 }}>
-        <div style={{ width: '100%', maxWidth: 300, aspectRatio: '1/1', position: 'relative' }}>
-          {[0, 1, 2, 3].map(i => (
-            <div key={i} style={{
-              position: 'absolute', borderColor: '#F5A623',
-              ...[
-                { top: -2, left: -2, borderTop: '3px solid #F5A623', borderLeft: '3px solid #F5A623', width: 20, height: 20 },
-                { top: -2, right: -2, borderTop: '3px solid #F5A623', borderRight: '3px solid #F5A623', width: 20, height: 20 },
-                { bottom: -2, left: -2, borderBottom: '3px solid #F5A623', borderLeft: '3px solid #F5A623', width: 20, height: 20 },
-                { bottom: -2, right: -2, borderBottom: '3px solid #F5A623', borderRight: '3px solid #F5A623', width: 20, height: 20 }
-              ][i]
-            }} />
-          ))}
-          <div style={{ width: '100%', height: '100%', border: '2px solid rgba(29,185,84,0.6)', borderRadius: '0px 32px 0px 32px', position: 'relative', overflow: 'hidden' }}>
-            <div className="scan-line" />
+      <div className="flex-1 flex items-center justify-center p-8 relative z-[5]">
+        <div className="w-full max-w-[300px] aspect-square relative">
+          <div className="absolute top-[-2px] left-[-2px] w-5 h-5 border-t-[3px] border-l-[3px] border-accent" />
+          <div className="absolute top-[-2px] right-[-2px] w-5 h-5 border-t-[3px] border-r-[3px] border-accent" />
+          <div className="absolute bottom-[-2px] left-[-2px] w-5 h-5 border-b-[3px] border-l-[3px] border-accent" />
+          <div className="absolute bottom-[-2px] right-[-2px] w-5 h-5 border-b-[3px] border-r-[3px] border-accent" />
+
+          <div className="w-full h-full border-2 border-primary/60 rounded-geo-2xl relative overflow-hidden">
+            <div className="absolute left-0 right-0 h-[3px] bg-primary shadow-[0_0_16px_rgba(29,185,84,0.9)] animate-scan-line" />
           </div>
         </div>
       </div>
 
       {/* Bottom overlay */}
-      <div style={{ position: 'relative', zIndex: 10, paddingBottom: 56, background: 'linear-gradient(to top, rgba(10,10,10,0.95) 0%, transparent 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 40 }}>
+      <div className="relative z-10 pb-14 pt-10 flex flex-col items-center"
+           style={{ background: 'linear-gradient(to top, rgba(10,10,10,0.95) 0%, transparent 100%)' }}>
         <button
           onClick={() => go('hasilScan')}
-          style={{ width: 72, height: 72, borderRadius: '50%', background: '#fff', border: '8px solid rgba(255,255,255,0.3)', cursor: 'pointer', outline: 'none', transition: 'all 0.2s' }}
+          className="w-[72px] h-[72px] rounded-full bg-white border-8 border-white/30 cursor-pointer outline-none transition-all duration-200 active:scale-95"
         />
       </div>
     </div>
