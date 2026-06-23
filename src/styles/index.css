@@ -3,26 +3,29 @@
 @tailwind utilities;
 
 @layer base {
-  html, body, #root {
+
+  html,
+  body,
+  #root {
     height: 100%;
+    width: 100%;
+    /* Pastikan root menggunakan lebar penuh */
   }
 
   body {
     @apply font-sans antialiased text-ink;
     background: #f3f4f6;
-    overflow: hidden;
+    /* Ubah 'overflow: hidden' jika Anda ingin halaman desktop bisa di-scroll secara alami */
+    overflow-x: hidden;
   }
 
-  /* Mobile-mockup container: keeps the app proportional inside a phone-width
-     frame even on wide desktop viewports, matching the original prototype shell. */
+  /* UBAH DI SINI: Hapus max-width 480px agar melebar penuh di desktop */
   #root {
-    @apply relative bg-surface mx-auto;
+    @apply relative bg-surface;
     width: 100%;
-    max-width: 480px;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+    /* max-width dan box-shadow dihapus agar tidak berbentuk box HP lagi */
   }
 
-  /* Visible keyboard focus everywhere — accessibility floor */
   button:focus-visible,
   input:focus-visible,
   textarea:focus-visible,
@@ -31,7 +34,10 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -40,50 +46,47 @@
 }
 
 @layer components {
-  /* Shared phone-frame shell used by every screen in the prototype */
+
+  /* Phone shell diubah menjadi layout yang fleksibel */
   .phone-shell {
-    @apply flex flex-col h-screen bg-surface relative overflow-hidden;
+    @apply flex flex-col min-h-screen bg-surface relative overflow-x-hidden;
   }
 
-  /* Top App Bar — back button left, centered title */
   .top-app-bar {
     @apply w-full h-14 flex items-center px-4 shrink-0 relative border-b border-line bg-white;
   }
+
+  /* Di desktop, biarkan judul berada di kiri setelah tombol back, tidak mati di tengah */
   .top-app-bar h2 {
-    @apply absolute left-1/2 -translate-x-1/2 text-lg font-bold text-ink;
+    @apply static translate-x-0 ml-4 text-lg font-bold text-ink md:static md:translate-x-0;
   }
+
   .back-btn {
-    @apply w-9 h-9 rounded-[10px] bg-[#F5F5F5] border-none flex items-center justify-center
-           cursor-pointer text-lg text-ink;
+    @apply w-9 h-9 rounded-[10px] bg-[#F5F5F5] border-none flex items-center justify-center cursor-pointer text-lg text-ink;
   }
 
   .scroll-content {
-    @apply flex-1 overflow-y-auto;
+    @apply flex-1 overflow-y-auto w-full;
   }
 
-  /* Primary / secondary buttons */
+  /* Button & Input */
   .btn-primary {
-    @apply w-full h-[52px] rounded-geo-lg bg-primary text-white font-sans text-base font-bold
-           border-none cursor-pointer shadow-cta-primary transition-transform duration-150
-           active:scale-[0.97] active:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none;
+    @apply w-full h-[52px] rounded-geo-lg bg-primary text-white font-sans text-base font-bold border-none cursor-pointer shadow-cta-primary transition-transform duration-150 active:scale-[0.97] active:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none;
   }
+
   .btn-secondary {
-    @apply w-full h-[52px] rounded-geo-lg bg-[#F5F5F5] text-muted font-sans text-base font-bold
-           border border-line cursor-pointer transition-colors duration-200 active:bg-[#EEEEEE]
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply w-full h-[52px] rounded-geo-lg bg-[#F5F5F5] text-muted font-sans text-base font-bold border border-line cursor-pointer transition-colors duration-200 active:bg-[#EEEEEE] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Text input */
   .input-field {
-    @apply w-full h-[52px] rounded-[10px] border border-line bg-white px-4
-           font-sans text-[15px] text-ink outline-none transition-colors duration-200
-           placeholder:text-[#BDBDBD] focus:border-primary;
+    @apply w-full h-[52px] rounded-[10px] border border-line bg-white px-4 font-sans text-[15px] text-ink outline-none transition-colors duration-200 placeholder:text-[#BDBDBD] focus:border-primary;
   }
 
-  /* The big points balance card used on Dashboard / TukarPoin / Profil */
+  /* Cards */
   .poin-card {
     @apply bg-accent-tint rounded-geo-xl border border-line p-6 relative overflow-hidden;
   }
+
   .poin-card::before {
     content: '';
     @apply absolute top-0 left-0 w-1 h-full bg-accent;
@@ -92,69 +95,65 @@
   .progress-track {
     @apply h-1.5 bg-line rounded-none overflow-hidden;
   }
+
   .progress-fill {
     @apply h-full bg-accent transition-[width] duration-1000 ease-out;
   }
 
-  /* Chip toggle — "wallet select" variant (RewardPref/Register): pill, green-tint when active */
   .chip {
-    @apply h-10 px-3 rounded-full border-[1.5px] border-[#EEEEEE] bg-[#EEEEEE]
-           flex items-center justify-center gap-1.5 text-[13px] font-semibold text-placeholder
-           cursor-pointer transition-all duration-200;
+    @apply h-10 px-3 rounded-full border-[1.5px] border-[#EEEEEE] bg-[#EEEEEE] flex items-center justify-center gap-1.5 text-[13px] font-semibold text-placeholder cursor-pointer transition-all duration-200;
   }
+
   .chip.active {
     @apply border-primary bg-primary-tint text-primary;
   }
 
-  /* Chip toggle — "filter/schedule" variant: square-ish, black-invert when active */
   .chip-filter {
-    @apply flex-1 h-12 rounded-[10px] border border-line bg-white
-           flex items-center justify-center text-sm font-bold text-muted
-           cursor-pointer transition-all duration-200;
+    @apply flex-1 h-12 rounded-[10px] border border-line bg-white flex items-center justify-center text-sm font-bold text-muted cursor-pointer transition-all duration-200;
   }
+
   .chip-filter.active {
     @apply bg-ink text-white border-ink;
   }
 
-  /* Generic white card, distinct from .poin-card (which has the accent left-rail) */
   .card {
     @apply bg-white border border-line rounded-geo-lg p-4;
   }
 
-  /* Bottom Navigation Bar — fixed to viewport but width-clamped to the
-     480px mockup frame so it stays aligned with #root on wide screens. */
+  /* UBAH DI SINI: Hapus max-width agar bottom nav memanjang penuh di desktop, 
+     atau pasang max-w-7xl agar rapi di monitor lebar */
   .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    max-width: 480px;
-    margin: 0 auto;
+    width: 100%;
     height: 72px;
     background: #fff;
     border-top: 1px solid #E0E0E0;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    justify-content: space-around;
     align-items: center;
-    padding: 0 8px;
+    padding: 0 24px;
     z-index: 50;
   }
 
   .nav-tab {
-    @apply flex flex-col items-center justify-center gap-1 w-full h-full text-placeholder cursor-pointer;
+    @apply flex flex-col items-center justify-center gap-1 h-full text-placeholder cursor-pointer px-4;
   }
+
   .nav-tab i {
     @apply text-xl;
   }
+
   .nav-tab span {
     @apply text-[9px] font-extrabold tracking-wide;
   }
+
   .nav-tab.active {
     @apply text-primary;
   }
 
-  /* Scan CTA — distinctive half-pill radius (0% 50% 0% 50%), not the
-     rounded-geo square-corner family used elsewhere. */
   .nav-scan-btn {
     width: 56px;
     height: 56px;
