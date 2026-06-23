@@ -35,7 +35,7 @@ export default function Profil() {
 
   const handleLogout = async () => {
     // Best-effort server-side logout — don't block UI on failure
-    if (token) apiLogout(token).catch(() => {});
+    if (token) apiLogout(token).catch(() => { });
     // logout action resets Redux state to initialState (all empty)
     // store.js subscriber sees token === null and calls clearSession()
     dispatch(logout());
@@ -43,15 +43,15 @@ export default function Profil() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-surface relative">
-      <div className="top-app-bar">
+    <div className="flex flex-col h-screen bg-surface relative overflow-hidden">
+      <div className="top-app-bar shrink-0">
         <button className="back-btn" onClick={() => go('dashboard')}>
           <i className="bi bi-arrow-left" />
         </button>
         <h2>Profil</h2>
       </div>
 
-      <div className="scroll-content px-6 pt-6 pb-[100px]">
+      <div className="flex-1 overflow-y-auto px-6 pt-6 pb-[100px]">
         {/* Identity card */}
         <div className="flex items-center gap-4 mb-7">
           <div className="w-16 h-16 rounded-geo-flip bg-ink-soft flex items-center justify-center shrink-0">
@@ -114,7 +114,9 @@ export default function Profil() {
         </button>
       </div>
 
-      <BottomNav active="profil" />
+      <div className="shrink-0">
+        <BottomNav active="profil" />
+      </div>
     </div>
   );
 }
