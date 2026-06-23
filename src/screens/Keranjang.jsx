@@ -4,6 +4,17 @@ import { useAppNavigation } from '../app/useAppNavigation';
 import { setPickupDraft, removeFromCart } from '../features/user/userSlice';
 import BottomNav from '../components/BottomNav';
 
+// PENENTU IKON DINAMIS: Memastikan Cardboard & Plastic selalu mendapatkan ikon yang benar
+function getIcon(name) {
+  if (!name) return 'bi-recycle';
+
+  const lower = name.toLowerCase();
+  if (lower === 'cardboard') return 'bi-box-seam'; // Ikon Kotak Kardus
+  if (lower === 'plastic') return 'bi-recycle';    // Ikon Daur Ulang Plastik
+
+  return 'bi-recycle';
+}
+
 export default function Keranjang() {
   const { go } = useAppNavigation();
   const dispatch = useDispatch();
@@ -82,11 +93,14 @@ export default function Keranjang() {
                     className="w-5 h-5 shrink-0 accent-primary"
                     style={{ cursor: locked ? 'default' : 'pointer' }}
                   />
+                  {/* UPDATE: Menggunakan fungsi getIcon() agar ikon langsung berubah mengikuti kategori nama item */}
                   <div className="w-11 h-11 rounded-[10px] bg-surface border border-line flex items-center justify-center shrink-0">
-                    <i className={`bi ${item.icon} text-xl text-ink`} />
+                    <i className={`bi ${getIcon(item.name || item.category)} text-xl text-ink`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-extrabold text-ink truncate">{item.category}</div>
+                    <div className="text-sm font-extrabold text-ink truncate">
+                      {item.name || item.category}
+                    </div>
                     <div className={`text-[11px] mt-1 font-semibold ${urgent ? 'text-accent' : 'text-placeholder'}`}>
                       {formatUsia(item.daysInCart)}
                       {urgent && ' · segera ajukan pickup'}

@@ -21,18 +21,71 @@ export default function FormPickup() {
   };
 
   const handleUseCurrentLocation = () => {
-    // Dummy simulasi GPS untuk prototype — tidak ada integrasi API sungguhan
+    if (!navigator.geolocation) {
+      alert('Browser atau perangkat Anda tidak mendukung fitur deteksi lokasi GPS.');
+      return;
+    }
+
     setLocating(true);
-    setTimeout(() => {
-      setAddress('Jl. Merdeka No. 45, Klojen, Malang, Jawa Timur 65119');
-      setLocating(false);
-    }, 900);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+            {
+              headers: {
+                'Accept-Language': 'id',
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          if (data && data.display_name) {
+            setAddress(data.display_name);
+          } else {
+            setAddress(`Koordinat GPS: ${latitude}, ${longitude}`);
+          }
+        } catch (error) {
+          console.error('Gagal mengambil detail nama alamat:', error);
+          setAddress(`Koordinat GPS: ${latitude}, ${longitude}`);
+        } finally {
+          setLocating(false);
+        }
+      },
+      (error) => {
+        console.error('Error saat mendeteksi GPS:', error);
+        setLocating(false);
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert('Izin akses lokasi ditolak. Harap izinkan GPS pada browser Anda.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert('Informasi lokasi tidak tersedia. Coba nyalakan GPS perangkat Anda.');
+            break;
+          case error.TIMEOUT:
+            alert('Waktu deteksi lokasi habis. Silakan coba lagi.');
+            break;
+          default:
+            alert('Gagal mendeteksi lokasi saat ini.');
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 8000,
+        maximumAge: 0
+      }
+    );
   };
 
   return (
     <div className="flex flex-col h-screen bg-surface relative">
       <div className="top-app-bar">
-        <button className="back-btn" onClick={() => go('hasilScan')}><i className="bi bi-arrow-left" /></button>
+        <button className="back-btn" onClick={() => go('keranjang')}><i className="bi bi-arrow-left" /></button>
         <h2>Penjadwalan Logistik</h2>
       </div>
 
@@ -59,7 +112,7 @@ export default function FormPickup() {
             {locating ? (
               <>
                 <i className="bi bi-arrow-repeat animate-spin" />
-                Mendeteksi lokasi...
+                Mendeteksi lokasi GPS riil...
               </>
             ) : (
               <>
@@ -94,8 +147,35 @@ export default function FormPickup() {
         </div>
       </div>
 
+      {/* FOOTER: Menyimpan data ke riwayat dan navigasi langsung diserahkan ke tracking tanpa pemicu interval di sini */}
       <div className="absolute bottom-0 left-0 w-full p-6 bg-white border-t border-line">
-        <button className="btn-primary" onClick={() => go('tracking')}>Konfirmasi Order</button>
+        <button
+          className="btn-primary"
+          onClick={() => {
+            const history = JSON.parse(localStorage.getItem('pickupHistory') || '[]');
+
+            // Generate ID unik untuk referensi pelacakan di Tracking.jsx
+            const currentId = Date.now();
+
+            history.unshift({
+              id: currentId,
+              name: schedule === 'sekarang' ? 'Penjemputan Instan' : `Jadwal (${slots[selectedSlot].name})`,
+              date: new Date().toLocaleString('id-ID'),
+              status: schedule === 'sekarang' ? 'DALAM_PROSES' : 'DIJADWALKAN',
+              estimatedPoints: (JSON.parse(localStorage.getItem('lastScan') || '{}').estimatedPoints || 0),
+              grade: (JSON.parse(localStorage.getItem('lastScan') || '{}').grade || '-'),
+              material: (JSON.parse(localStorage.getItem('lastScan') || '{}').category || '-'),
+              address
+            });
+
+            localStorage.setItem('pickupHistory', JSON.stringify(history));
+            localStorage.setItem('activeTrackingId', String(currentId));
+
+            go('tracking');
+          }}
+        >
+          Konfirmasi Order
+        </button>
       </div>
 
       {/* Sheet Modal */}

@@ -24,7 +24,8 @@ export const initialState = {
   cartItems: [], // { id, category, icon, estimatedPoints, daysInCart }
 
   // Pickup
-  pickupDraft: null, // { source: 'cart' | 'direct', items: [...] }
+  pickupDraft: null,
+  pickupHistory: []
 };
 
 const userSlice = createSlice({
@@ -111,6 +112,10 @@ const userSlice = createSlice({
       state.points += action.payload;
     },
 
+    setPickupHistory:(state,action)=>{
+      state.pickupHistory=action.payload;
+    },
+
     // Logout — wipe everything back to blank slate
     logout: () => initialState,
   },
@@ -128,6 +133,7 @@ export const {
   clearPickupDraft,
   redeemPoints,
   addPoints,
+  setPickupHistory,
   logout,
 } = userSlice.actions;
 

@@ -9,7 +9,6 @@ export default function HasilScan() {
   const scanResult = useSelector((state) => state.user.scanResult);
   const [showToast, setShowToast] = useState(false);
 
-  // If somehow we land here with no scan result, send back to camera
   if (!scanResult) {
     go('kamera');
     return null;
@@ -30,7 +29,9 @@ export default function HasilScan() {
   const confidencePct = Math.round((confidence ?? 0) * 100);
   const icon = category?.toLowerCase().includes('kardus') ? 'bi-box-seam' : 'bi-recycle';
 
+  // JEMBATAN KONTEKS: Tambahkan properti 'name' di sini agar sinkron dengan sistem Riwayat & Dashboard
   const wasteItem = {
+    name: category, // Menyimpan "Cardboard" atau "Plastic" ke dalam properti name
     category,
     icon,
     estimatedPoints,
@@ -50,7 +51,7 @@ export default function HasilScan() {
   const handleDirectPickup = () => {
     dispatch(setPickupDraft({ source: 'direct', items: [wasteItem] }));
     dispatch(clearScanResult());
-    go('formPickup');
+    go('formPickup'); // Jika dialihkan ke formPickup dulu, pastikan form tersebut meneruskan array items ini ke Tracking.jsx
   };
 
   const handleRescan = () => {
@@ -68,7 +69,6 @@ export default function HasilScan() {
       </div>
 
       <div className="flex-1 px-6 flex flex-col items-center mt-4 overflow-y-auto pb-4">
-
         {/* Captured image preview */}
         <div
           className="w-full h-[220px] rounded-geo-xl relative overflow-hidden border border-line shrink-0 bg-cover bg-center bg-[#111]"

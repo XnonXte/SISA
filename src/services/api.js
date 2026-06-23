@@ -60,15 +60,16 @@ export function apiUpdateRewardPref(_token, payload) {
 
 // ── Trash Scanning ───────────────────────────────────────────────────────────
 
-export function apiScanImage(_token, _imageBase64) {
-  const results = [
-    { category: 'Plastik PET (Bening)', estimatedPoints: 150, confidence: 0.94, grade: 'Grade A', status: 'accepted', anomalies: [], instruction: 'Pastikan botol bersih dan tidak penyok.' },
-    { category: 'Kardus Cokelat', estimatedPoints: 80, confidence: 0.88, grade: 'Grade B', status: 'accepted', anomalies: [], instruction: 'Lipat kardus agar lebih ringkas.' },
-    { category: 'Plastik HDPE', estimatedPoints: 120, confidence: 0.91, grade: 'Grade A', status: 'accepted', anomalies: [], instruction: 'Cuci dahulu sebelum dikumpulkan.' },
-    { category: 'Bahan Tidak Dikenal', estimatedPoints: 0, confidence: 0.42, grade: '-', status: 'rejected', anomalies: ['Tidak dapat diidentifikasi'], instruction: 'Coba foto ulang dengan pencahayaan yang lebih baik.' },
-  ];
-  const pick = results[Math.floor(Math.random() * results.length)];
-  return Promise.resolve(ok(pick));
+export async function apiScanImage(_token, imageBase64) {
+ const blob=await (await fetch(imageBase64)).blob();
+ const fd=new FormData(); fd.append('file',blob,'scan.jpg');
+ const r=await fetch(`${import.meta.env.VITE_API_URL}/classify-waste`,{method:'POST',body:fd});
+ if(!r.ok) return fail('Scan gagal');
+ const j=await r.json();
+ const accepted=['Plastic','Cardboard'].includes(j.primary_material);
+ const grade=j.sub_classification||'-';
+ const points=grade==='Grade A'?150:grade==='Grade B'?100:0;
+ return ok({category:j.primary_material,estimatedPoints:points,confidence:parseFloat(j.primary_accuracy)/100,grade,status:accepted?'accepted':'rejected',anomalies:[],instruction:''});
 }
 
 // ── Cart / Pickup ─────────────────────────────────────────────────────────────

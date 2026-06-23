@@ -1,16 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAppNavigation } from '../app/useAppNavigation';
+import { addPoints, setPickupHistory } from '../features/user/userSlice';
 import BottomNav from '../components/BottomNav';
-
-const items = [
-  { name: 'PET Bening', date: '02 JUN 2026 · 10:30 WIB', status: 'SELESAI', icon: 'bi-recycle', estimatedPoints: 150, verifiedPoints: 150 },
-  { name: 'Kardus Grade A', date: '02 JUN 2026 · 09:15 WIB', status: 'DALAM_PROSES', icon: 'bi-box-seam', estimatedPoints: 100, verifiedPoints: null },
-  { name: 'PET Bening (Kontaminasi)', date: '01 JUN 2026 · 14:00 WIB', status: 'DIBATALKAN', icon: 'bi-recycle', estimatedPoints: 80, verifiedPoints: null },
-  { name: 'Kardus Bergelombang', date: '28 MEI 2026 · 11:45 WIB', status: 'SELESAI', icon: 'bi-box-seam', estimatedPoints: 120, verifiedPoints: 95 },
-  { name: 'Botol Kaca', date: '27 MEI 2026 · 16:00 WIB', status: 'DIJADWALKAN', icon: 'bi-cup-straw', estimatedPoints: 60, verifiedPoints: null },
-  { name: 'Galon Plastik', date: '26 MEI 2026 · 13:20 WIB', status: 'MENUNGGU_MITRA', icon: 'bi-droplet', estimatedPoints: 90, verifiedPoints: null },
-  { name: 'Koran Bekas', date: '25 MEI 2026 · 08:10 WIB', status: 'MENUNGGU_MITRA_TERSEDIA', icon: 'bi-newspaper', estimatedPoints: 40, verifiedPoints: null },
-];
 
 const STATUS = {
   MENUNGGU_MITRA: { label: 'Menunggu Mitra', bg: 'bg-[#F5F5F5]', color: 'text-muted', border: 'border-[#BDBDBD]' },
@@ -21,14 +13,38 @@ const STATUS = {
   DIBATALKAN: { label: 'Dibatalkan', bg: 'bg-danger-tint', color: 'text-danger', border: 'border-danger' },
 };
 
+// PERBAIKAN: Logika yang jauh lebih ringkas karena kategori sudah pasti 'Cardboard' atau 'Plastic'
+function getIcon(name) {
+  if (!name) return 'bi-recycle';
+
+  const lower = name.toLowerCase();
+  if (lower === 'cardboard') return 'bi-box-seam'; // Ikon Kotak Kardus
+  if (lower === 'plastic') return 'bi-recycle';    // Ikon Daur Ulang Plastik
+
+  return 'bi-recycle'; // Fallback ikon jika ada kategori lain di masa depan
+}
+
+function formatRiwayatDate(dateStr) {
+  if (!dateStr) return '';
+  if (dateStr.includes('/')) {
+    const parts = dateStr.split(',');
+    if (parts.length > 1) {
+      const [d, m, y] = parts[0].trim().split('/');
+      let time = parts[1].trim().replace(/\./g, ':');
+      if (time.split(':').length === 3) time = time.split(':').slice(0, 2).join(':');
+
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
+      const monthStr = months[parseInt(m) - 1] || m;
+      return `${d.padStart(2, '0')} ${monthStr} ${y} · ${time} WIB`;
+    }
+  }
+  return dateStr;
+}
+
 function PointsLabel({ item }) {
-  if (item.status === 'DIBATALKAN') {
-    return <span className="text-placeholder">+0 PT</span>;
-  }
-  if (item.status === 'SELESAI') {
-    return <span className="text-primary">+{item.verifiedPoints} PT</span>;
-  }
-  return <span className="text-accent">~{item.estimatedPoints} PT</span>;
+  if (item.status === 'DIBATALKAN') return <span className="text-placeholder">+0 PT</span>;
+  if (item.status === 'SELESAI') return <span className="text-primary">+{item.verifiedPoints || item.estimatedPoints || 100} PT</span>;
+  return <span className="text-accent">~{item.estimatedPoints || 100} PT</span>;
 }
 
 function EmptyState({ go }) {
@@ -48,7 +64,41 @@ function EmptyState({ go }) {
 
 export default function Riwayat() {
   const { go } = useAppNavigation();
+  const dispatch = useDispatch();
   const [expandedIdx, setExpandedIdx] = useState(null);
+
+  const historyFromRedux = useSelector(s => s.user.pickupHistory);
+  const items = historyFromRedux || JSON.parse(localStorage.getItem('pickupHistory') || '[]');
+
+  // LOGIKA BACKGROUND PROGRESS TICKER
+  useEffect(() => {
+    const checkBackgroundTracking = () => {
+      const currentHistory = JSON.parse(localStorage.getItem('pickupHistory') || '[]');
+      let hasChanged = false;
+
+      const updatedHistory = currentHistory.map(item => {
+        if (item.status === 'DALAM_PROSES') {
+          const timePassed = Date.now() - (item.startTime || 0);
+          if (timePassed >= 15000) {
+            hasChanged = true;
+            if (!item.pointsAdded) {
+              dispatch(addPoints(item.estimatedPoints || 0));
+            }
+            return { ...item, status: 'SELESAI', pointsAdded: true };
+          }
+        }
+        return item;
+      });
+
+      if (hasChanged) {
+        localStorage.setItem('pickupHistory', JSON.stringify(updatedHistory));
+        dispatch(setPickupHistory(updatedHistory));
+      }
+    };
+
+    const intervalId = setInterval(checkBackgroundTracking, 1000);
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
 
   return (
     <div className="flex flex-col h-screen bg-surface relative">
@@ -62,38 +112,56 @@ export default function Riwayat() {
       ) : (
         <div className="scroll-content px-6 pt-6 pb-[100px] flex flex-col gap-3">
           {items.map((item, i) => {
-            const st = STATUS[item.status];
+            const st = STATUS[item.status] || STATUS.SELESAI;
             const isAdjusted = item.status === 'SELESAI' && item.verifiedPoints != null && item.verifiedPoints !== item.estimatedPoints;
             const isExpanded = expandedIdx === i;
+            const isTrackingActive = item.status === 'DALAM_PROSES';
+
+            const handleCardClick = () => {
+              if (isTrackingActive) {
+                localStorage.setItem('activeTrackingId', String(item.id));
+                go('tracking');
+              } else if (isAdjusted) {
+                setExpandedIdx(isExpanded ? null : i);
+              }
+            };
 
             return (
               <div
                 key={i}
-                onClick={isAdjusted ? () => setExpandedIdx(isExpanded ? null : i) : undefined}
-                className={`bg-white border border-line rounded-geo-flip p-3.5 ${isAdjusted ? 'cursor-pointer' : ''}`}
+                onClick={handleCardClick}
+                className={`bg-white border transition-all duration-200 p-3.5 rounded-geo-flip cursor-pointer ${isTrackingActive ? 'border-accent/50 bg-accent-tint/10 shadow-sm animate-pulse-subtle' : 'border-line'
+                  }`}
               >
                 <div className="flex items-center gap-3.5">
                   <div className="w-11 h-11 rounded-[10px] bg-surface border border-line flex items-center justify-center shrink-0">
-                    <i className={`bi ${item.icon} text-xl text-ink`} />
+                    <i className={`bi ${getIcon(item.name)} text-xl text-ink`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-extrabold text-ink truncate uppercase">{item.name}</div>
-                    <div className="text-[11px] text-muted mt-1 font-semibold">{item.date}</div>
+                    <div className="text-sm font-extrabold text-ink truncate uppercase flex items-center gap-1.5">
+                      {item.name || 'MATERIAL'}
+                      {isTrackingActive && (
+                        <span className="w-2 h-2 rounded-full bg-accent inline-block animate-ping" />
+                      )}
+                    </div>
+                    <div className="text-[11px] text-muted mt-1 font-semibold">
+                      {formatRiwayatDate(item.date)}
+                    </div>
                   </div>
                   <div className="flex flex-col items-end gap-1.5 shrink-0">
                     <div className="text-sm font-extrabold"><PointsLabel item={item} /></div>
                     <div className={`text-[10px] font-extrabold rounded-geo-xs px-2 py-1 ${st.bg} ${st.color} border ${st.border} uppercase tracking-wide whitespace-nowrap`}>
                       {st.label}
                     </div>
-                    {isAdjusted && (
-                      <div className="flex items-center gap-1 text-[9px] font-extrabold text-accent uppercase tracking-wide">
-                        <i className="bi bi-info-circle-fill" />
-                        Disesuaikan
-                        <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`} />
-                      </div>
-                    )}
                   </div>
                 </div>
+
+                {isTrackingActive && (
+                  <div className="mt-2.5 pt-2 border-t border-dashed border-accent/20 text-[11px] text-accent font-bold flex items-center justify-between">
+                    <span><i className="bi bi-geo-alt-fill mr-1" /> Pelacakan kurir sedang aktif</span>
+                    <span className="underline">Buka Detail →</span>
+                  </div>
+                )}
 
                 {isAdjusted && isExpanded && (
                   <div className="mt-3 pt-3 border-t border-dashed border-line text-xs text-muted leading-relaxed">
@@ -110,7 +178,6 @@ export default function Riwayat() {
           </div>
         </div>
       )}
-
       <BottomNav active="riwayat" />
     </div>
   );
