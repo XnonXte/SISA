@@ -75,44 +75,55 @@ export default function Kamera() {
   }, [torchOn]);
 
   // ── CROP TO SCAN FRAME ──────────────────────────────────────
-  const cropToFrame = useCallback((imageBase64) => {
+  const cropToFrame = useCallback(() => {
     return new Promise((resolve) => {
       if (!frameRef.current || !webcamRef.current) {
-        resolve(imageBase64);
+        const fallback = webcamRef.current?.getScreenshot({ width: 1280, height: 720 });
+        resolve(fallback ?? null);
         return;
       }
 
       const video = webcamRef.current.video;
       const frameEl = frameRef.current;
 
-      if (!video) {
-        resolve(imageBase64);
+      if (!video || !video.videoWidth) {
+        const fallback = webcamRef.current?.getScreenshot({ width: 1280, height: 720 });
+        resolve(fallback ?? null);
         return;
       }
+
+      // Gambar langsung dari elemen video ke canvas — resolusi native kamera
+      const nativeW = video.videoWidth;
+      const nativeH = video.videoHeight;
 
       const videoRect = video.getBoundingClientRect();
       const frameRect = frameEl.getBoundingClientRect();
 
-      // Scale factor from displayed video size to actual video resolution
-      const scaleX = video.videoWidth / videoRect.width;
-      const scaleY = video.videoHeight / videoRect.height;
+      // Scale factor: dari ukuran tampilan ke resolusi native
+      const scaleX = nativeW / videoRect.width;
+      const scaleY = nativeH / videoRect.height;
 
-      const cropX = (frameRect.left - videoRect.left) * scaleX;
-      const cropY = (frameRect.top - videoRect.top) * scaleY;
-      const cropW = frameRect.width * scaleX;
-      const cropH = frameRect.height * scaleY;
+      const cropX = Math.max(0, (frameRect.left - videoRect.left) * scaleX);
+      const cropY = Math.max(0, (frameRect.top - videoRect.top) * scaleY);
+      const cropW = Math.min(frameRect.width * scaleX, nativeW - cropX);
+      const cropH = Math.min(frameRect.height * scaleY, nativeH - cropY);
 
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = cropW;
-        canvas.height = cropH;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-        resolve(canvas.toDataURL('image/jpeg', 0.92));
-      };
-      img.onerror = () => resolve(imageBase64);
-      img.src = imageBase64;
+      // Output canvas: upscale ke min 800px agar tidak blur di preview
+      const OUTPUT_SIZE = Math.max(800, Math.round(cropW), Math.round(cropH));
+
+      const canvas = document.createElement('canvas');
+      canvas.width = OUTPUT_SIZE;
+      canvas.height = OUTPUT_SIZE;
+      const ctx = canvas.getContext('2d');
+
+      // imageSmoothingQuality tinggi agar interpolasi lebih tajam
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // Gambar langsung dari video (bukan dari base64 screenshot)
+      ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
     });
   }, []);
 
@@ -160,14 +171,8 @@ export default function Kamera() {
   const handleCapture = useCallback(async () => {
     if (!webcamRef.current || scanning) return;
 
-    const imageBase64 = webcamRef.current.getScreenshot({
-      width: 1280,
-      height: 720,
-    });
-
-    if (!imageBase64) return;
-
-    const croppedBase64 = await cropToFrame(imageBase64);
+    const croppedBase64 = await cropToFrame();
+    if (!croppedBase64) return;
     await processImage(croppedBase64);
   }, [processImage, scanning]);
 
