@@ -27,6 +27,7 @@ export default function Kamera() {
   const webcamRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
+  const frameRef = useRef(null);
 
   const [torchOn, setTorchOn] = useState(false);
   const [torchSupported, setTorchSupported] = useState(false);
@@ -72,6 +73,48 @@ export default function Kamera() {
       }
     };
   }, [torchOn]);
+
+  // ── CROP TO SCAN FRAME ──────────────────────────────────────
+  const cropToFrame = useCallback((imageBase64) => {
+    return new Promise((resolve) => {
+      if (!frameRef.current || !webcamRef.current) {
+        resolve(imageBase64);
+        return;
+      }
+
+      const video = webcamRef.current.video;
+      const frameEl = frameRef.current;
+
+      if (!video) {
+        resolve(imageBase64);
+        return;
+      }
+
+      const videoRect = video.getBoundingClientRect();
+      const frameRect = frameEl.getBoundingClientRect();
+
+      // Scale factor from displayed video size to actual video resolution
+      const scaleX = video.videoWidth / videoRect.width;
+      const scaleY = video.videoHeight / videoRect.height;
+
+      const cropX = (frameRect.left - videoRect.left) * scaleX;
+      const cropY = (frameRect.top - videoRect.top) * scaleY;
+      const cropW = frameRect.width * scaleX;
+      const cropH = frameRect.height * scaleY;
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = cropW;
+        canvas.height = cropH;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+        resolve(canvas.toDataURL('image/jpeg', 0.92));
+      };
+      img.onerror = () => resolve(imageBase64);
+      img.src = imageBase64;
+    });
+  }, []);
 
   // ── SHARED PIPELINE ─────────────────────────────────────────
   const processImage = useCallback(
@@ -124,7 +167,8 @@ export default function Kamera() {
 
     if (!imageBase64) return;
 
-    await processImage(imageBase64);
+    const croppedBase64 = await cropToFrame(imageBase64);
+    await processImage(croppedBase64);
   }, [processImage, scanning]);
 
   // ── GALLERY PICK ────────────────────────────────────────────
@@ -232,7 +276,7 @@ export default function Kamera() {
 
       {/* Scan frame */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-[300px] aspect-square border-2 border-primary/60 rounded-geo-2xl relative">
+        <div ref={frameRef} className="w-full max-w-[300px] aspect-square border-2 border-primary/60 rounded-geo-2xl relative">
 
           {!scanning && (
             <div className="absolute left-0 right-0 h-[3px] bg-primary animate-scan-line" />

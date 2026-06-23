@@ -136,7 +136,7 @@ export default function HasilScan() {
 
       {/* Action buttons */}
       {/* PERBAIKAN 2: Mengubah pb-6 menjadi pb-24 agar area tombol tidak tenggelam di balik Bottom Nav Bar */}
-      <div className="px-6 pt-4 pb-24 bg-white border-t border-line flex flex-col gap-2.5">
+      <div className="px-6 pt-4 pb-6 bg-white border-t border-line flex flex-col gap-2.5">
         {isRejected ? (
           <button className="btn-primary" onClick={handleRescan}>
             <i className="bi bi-camera mr-2" />Pindai Ulang
