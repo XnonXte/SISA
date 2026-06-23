@@ -60,7 +60,8 @@ export default function HasilScan() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-surface relative">
+    // PERBAIKAN 1: Mengubah h-screen menjadi h-[100dvh] agar menyesuaikan tinggi layar HP yang sebenarnya
+    <div className="flex flex-col h-[100dvh] bg-surface relative">
       <div className="top-app-bar">
         <button className="back-btn" onClick={handleRescan}>
           <i className="bi bi-arrow-left" />
@@ -134,7 +135,8 @@ export default function HasilScan() {
       </div>
 
       {/* Action buttons */}
-      <div className="px-6 pt-4 pb-6 bg-white border-t border-line flex flex-col gap-2.5">
+      {/* PERBAIKAN 2: Mengubah pb-6 menjadi pb-24 agar area tombol tidak tenggelam di balik Bottom Nav Bar */}
+      <div className="px-6 pt-4 pb-24 bg-white border-t border-line flex flex-col gap-2.5">
         {isRejected ? (
           <button className="btn-primary" onClick={handleRescan}>
             <i className="bi bi-camera mr-2" />Pindai Ulang

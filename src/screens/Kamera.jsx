@@ -17,53 +17,6 @@ const WEBCAM_CONSTRAINTS = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// IMAGE PROCESSING HELPERS
-// ─────────────────────────────────────────────────────────────
-const loadImage = (src) =>
-  new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
-
-const cropToSquare = (img) => {
-  const size = Math.min(img.width, img.height);
-
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx = canvas.getContext('2d');
-
-  const x = (img.width - size) / 2;
-  const y = (img.height - size) / 2;
-
-  ctx.drawImage(img, x, y, size, size, 0, 0, size, size);
-
-  return canvas;
-};
-
-const compressCanvas = (canvas, quality = 0.75, maxSize = 768) => {
-  const scale = Math.min(maxSize / canvas.width, 1);
-
-  const outCanvas = document.createElement('canvas');
-  outCanvas.width = canvas.width * scale;
-  outCanvas.height = canvas.height * scale;
-
-  const ctx = outCanvas.getContext('2d');
-  ctx.drawImage(canvas, 0, 0, outCanvas.width, outCanvas.height);
-
-  return outCanvas.toDataURL('image/jpeg', quality);
-};
-
-const processImageInput = async (imageSrc) => {
-  const img = await loadImage(imageSrc);
-  const cropped = cropToSquare(img);
-  return compressCanvas(cropped, 0.75, 768);
-};
-
-// ─────────────────────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────
 export default function Kamera() {
@@ -127,9 +80,8 @@ export default function Kamera() {
       setScanError(null);
 
       try {
-        const optimizedBase64 = await processImageInput(imageBase64);
-
-        const { data, error } = await apiScanImage(token, optimizedBase64);
+        // Mengirimkan base64 asli langsung ke API tanpa modifikasi client-side
+        const { data, error } = await apiScanImage(token, imageBase64);
 
         setScanning(false);
 
@@ -140,7 +92,7 @@ export default function Kamera() {
 
         dispatch(
           setScanResult({
-            imageBase64: optimizedBase64,
+            imageBase64: imageBase64, // Menyimpan gambar asli di state
             category: data.category,
             estimatedPoints: data.estimatedPoints,
             confidence: data.confidence,
@@ -260,8 +212,8 @@ export default function Kamera() {
           <button
             onClick={toggleTorch}
             className={`px-4 py-2 border text-[11px] font-bold rounded-geo-xs ${torchOn
-                ? 'bg-accent/80 border-accent text-ink'
-                : 'border-white/25 text-white'
+              ? 'bg-accent/80 border-accent text-ink'
+              : 'border-white/25 text-white'
               }`}
           >
             <i className={`bi ${torchOn ? 'bi-lightning-fill' : 'bi-lightning'}`} />
