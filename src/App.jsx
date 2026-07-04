@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import Splash from './screens/Splash';
+import Login from './screens/Login';
 import Register from './screens/Register';
 import RewardPref from './screens/RewardPref';
 import Kamera from './screens/Kamera';
@@ -17,6 +18,7 @@ import Keranjang from './screens/Keranjang';
 
 const SCREENS = {
   splash: Splash,
+  login: Login,
   register: Register,
   rewardPref: RewardPref,
   kamera: Kamera,
@@ -36,8 +38,11 @@ export default function App() {
   const Screen = SCREENS[screen] || Splash;
 
   return (
-    <div className="w-full h-screen bg-surface flex flex-col overflow-hidden">
-      <Screen />
+    <div className="w-full h-screen bg-gray-100 flex justify-center items-center md:p-4">
+      {/* Container Mobile */}
+      <div className="w-full max-w-[425px] h-full md:h-[92vh] bg-surface flex flex-col overflow-hidden shadow-2xl md:rounded-[32px] md:border md:border-line">
+        <Screen />
+      </div>
     </div>
   );
 }

@@ -5,9 +5,12 @@ export const initialState = {
   // Auth
   userId: null,
   token: null,
+  accessToken: null,
+  refreshToken: null,
 
   // Profile
   name: '',
+  email: '',
   phone: '',
   wallet: null,
   ewalletAccount: '',
@@ -34,10 +37,26 @@ const userSlice = createSlice({
   reducers: {
     // Called after successful login API response
     loginSuccess: (state, action) => {
-      const { userId, token, name, phone, wallet, ewalletAccount, rewardType, points, milestone } = action.payload;
+      const {
+        userId,
+        token,
+        accessToken,
+        refreshToken,
+        name,
+        email,
+        phone,
+        wallet,
+        ewalletAccount,
+        rewardType,
+        points,
+        milestone,
+      } = action.payload;
       state.userId = userId;
-      state.token = token;
+      state.accessToken = accessToken ?? token ?? null;
+      state.refreshToken = refreshToken ?? null;
+      state.token = accessToken ?? token ?? null;
       state.name = name ?? '';
+      state.email = email ?? '';
       state.phone = phone ?? '';
       state.wallet = wallet ?? null;
       state.ewalletAccount = ewalletAccount ?? '';

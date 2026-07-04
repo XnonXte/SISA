@@ -14,7 +14,10 @@ function saveSession(userState) {
     const session = {
       userId: userState.userId,
       token: userState.token,
+      accessToken: userState.accessToken,
+      refreshToken: userState.refreshToken,
       name: userState.name,
+      email: userState.email,
       phone: userState.phone,
       wallet: userState.wallet,
       ewalletAccount: userState.ewalletAccount,
