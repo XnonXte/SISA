@@ -16,10 +16,30 @@ function saveUsers(users) {
   localStorage.setItem('sisa_users', JSON.stringify(users));
 }
 
+function normalizeEmail(email) {
+  return email?.trim().toLowerCase() ?? '';
+}
+
+function hashPassword(password) {
+  let hash = 0;
+  for (let i = 0; i < password.length; i += 1) {
+    hash = (hash << 5) - hash + password.charCodeAt(i);
+    hash |= 0;
+  }
+  return `h_${Math.abs(hash).toString(16)}`;
+}
+
 function findUserByEmail(email) {
-  const normalized = email.trim().toLowerCase();
+  const normalized = normalizeEmail(email);
   const users = getUsers();
   return Object.values(users).find((u) => u.email?.toLowerCase() === normalized) ?? null;
+}
+
+function findUserByPhone(phone) {
+  const normalized = phone?.trim() ?? '';
+  if (!normalized) return null;
+  const users = getUsers();
+  return Object.values(users).find((u) => u.phone === normalized) ?? null;
 }
 
 // ── Login lockout (max 5 attempts → 15 min lock) ─────────────────────────────
@@ -85,29 +105,57 @@ function issueTokens(userId) {
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
-export function apiRegister({ name, phone, email, password }) {
-  const users = getUsers();
-  if (users[phone]) return Promise.resolve(fail('Nomor sudah terdaftar.'));
-  if (email && findUserByEmail(email)) return Promise.resolve(fail('Email sudah terdaftar.'));
+export function apiSendOtp({ email }) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return Promise.resolve(fail('Email wajib diisi.'));
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return Promise.resolve(fail('Email wajib valid.'));
+  }
+  if (findUserByEmail(normalizedEmail)) {
+    return Promise.resolve(fail('Email sudah terdaftar.'));
+  }
 
+  return Promise.resolve(ok({
+    otp: '123456',
+    expiresAt: Date.now() + 5 * 60 * 1000,
+    maxResends: 3,
+  }));
+}
+
+export function apiRegister({ name, phone, email, password }) {
+  const normalizedEmail = normalizeEmail(email);
+  const normalizedPhone = phone?.trim() ?? '';
+
+  if (!name?.trim()) return Promise.resolve(fail('Nama wajib diisi.'));
+  if (!normalizedEmail) return Promise.resolve(fail('Email wajib diisi.'));
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) return Promise.resolve(fail('Email wajib valid.'));
+  if (!password || password.length < 8) return Promise.resolve(fail('Password minimal 8 karakter.'));
+  if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+    return Promise.resolve(fail('Password harus mengandung huruf dan angka.'));
+  }
+  if (normalizedPhone && findUserByPhone(normalizedPhone)) return Promise.resolve(fail('Nomor telepon sudah terdaftar.'));
+  if (findUserByEmail(normalizedEmail)) return Promise.resolve(fail('Email sudah terdaftar.'));
+
+  const users = getUsers();
   const userId = `u_${Date.now()}`;
   const { accessToken, refreshToken } = issueTokens(userId);
   const user = {
     userId,
-    email: email?.trim().toLowerCase() ?? '',
-    password: password ?? '',
+    email: normalizedEmail,
+    password: hashPassword(password),
     accessToken,
     refreshToken,
     token: accessToken,
-    name,
-    phone,
+    name: name.trim(),
+    phone: normalizedPhone,
     points: 0,
     milestone: 1000,
     rewardType: null,
     wallet: null,
     ewalletAccount: '',
   };
-  users[phone] = user;
+  users[normalizedEmail] = user;
+  if (normalizedPhone) users[normalizedPhone] = user;
   saveUsers(users);
   return Promise.resolve(ok(user));
 }
@@ -132,7 +180,7 @@ export function apiLogin({ email, password }) {
     return Promise.resolve(fail('Password minimal 8 karakter.'));
   }
 
-  if (user.password !== password) {
+  if (user.password !== hashPassword(password)) {
     const attempts = recordFailedLogin(normalizedEmail);
     const remaining = MAX_LOGIN_ATTEMPTS - attempts;
     if (remaining <= 0) {
@@ -177,6 +225,53 @@ export function apiGetProfile(_token) {
 
 export function apiUpdateRewardPref(_token, payload) {
   return Promise.resolve(ok(payload));
+}
+
+// Update basic profile after registration (sets name, username, phone, profile photo)
+export function apiUpdateProfile({ email, name, username, phone, profilePhoto }) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return Promise.resolve(fail('Email wajib diisi.'));
+  const users = getUsers();
+  const user = Object.values(users).find((u) => u.email === normalizedEmail);
+  if (!user) return Promise.resolve(fail('Pengguna tidak ditemukan.'));
+
+  // Check username uniqueness
+  if (username) {
+    const conflict = Object.values(users).find((u) => u.username === username && u.email !== normalizedEmail);
+    if (conflict) return Promise.resolve(fail('Username sudah digunakan.'));
+  }
+
+  // Check phone uniqueness
+  if (phone) {
+    const conflictPhone = Object.values(users).find((u) => u.phone === phone && u.email !== normalizedEmail);
+    if (conflictPhone) return Promise.resolve(fail('Nomor HP sudah terdaftar.'));
+  }
+
+  // Update stored user
+  const updated = {
+    ...user,
+    name: name ?? user.name,
+    username: username ?? user.username,
+    phone: phone ?? user.phone,
+    profilePhoto: profilePhoto ?? user.profilePhoto,
+    ewalletAccount: phone ?? user.ewalletAccount,
+  };
+
+  // Save by email key
+  users[normalizedEmail] = updated;
+  // Also keep phone mapping for quick lookup
+  if (phone) users[phone] = updated;
+  saveUsers(users);
+
+  return Promise.resolve(ok({
+    userId: updated.userId,
+    email: updated.email,
+    name: updated.name,
+    phone: updated.phone,
+    username: updated.username,
+    profilePhoto: updated.profilePhoto,
+    ewalletAccount: updated.ewalletAccount,
+  }));
 }
 
 // ── Trash Scanning ───────────────────────────────────────────────────────────

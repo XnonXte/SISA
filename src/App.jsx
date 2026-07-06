@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import Splash from './screens/Splash';
 import Login from './screens/Login';
 import Register from './screens/Register';
+import CompleteProfile from './screens/CompleteProfile';
 import RewardPref from './screens/RewardPref';
 import Kamera from './screens/Kamera';
 import HasilScan from './screens/HasilScan';
@@ -20,6 +21,7 @@ const SCREENS = {
   splash: Splash,
   login: Login,
   register: Register,
+  completeProfile: CompleteProfile,
   rewardPref: RewardPref,
   kamera: Kamera,
   hasilScan: HasilScan,
@@ -38,11 +40,8 @@ export default function App() {
   const Screen = SCREENS[screen] || Splash;
 
   return (
-    <div className="w-full h-screen bg-gray-100 flex justify-center items-center md:p-4">
-      {/* Container Mobile */}
-      <div className="w-full max-w-[425px] h-full md:h-[92vh] bg-surface flex flex-col overflow-hidden shadow-2xl md:rounded-[32px] md:border md:border-line">
-        <Screen />
-      </div>
+    <div className="w-full h-screen bg-surface flex flex-col overflow-hidden">
+      <Screen />
     </div>
   );
 }

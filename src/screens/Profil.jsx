@@ -17,7 +17,7 @@ export default function Profil() {
   const { go } = useAppNavigation();
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
-  const { name, phone, wallet, rewardType, ewalletAccount, points, token } = userData;
+  const { name, username, phone, profilePhoto, wallet, rewardType, ewalletAccount, points, token } = userData;
 
   const isEwallet = rewardType !== 'listrik';
   const rewardIcon = isEwallet ? 'bi-wallet2' : 'bi-lightning-charge';
@@ -54,13 +54,22 @@ export default function Profil() {
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-[100px]">
         {/* Identity card */}
         <div className="flex items-center gap-4 mb-7">
-          <div className="w-16 h-16 rounded-geo-flip bg-ink-soft flex items-center justify-center shrink-0">
-            <i className="bi bi-person-fill text-white text-3xl" />
+          <div className="w-16 h-16 rounded-geo-flip bg-ink-soft overflow-hidden flex items-center justify-center shrink-0">
+            {profilePhoto ? (
+              <img src={profilePhoto} alt="Foto Profil" className="w-full h-full object-cover" />
+            ) : (
+              <div className="flex items-center justify-center w-full h-full bg-ink-soft text-white">
+                <i className="bi bi-person-fill text-3xl" />
+              </div>
+            )}
           </div>
           <div className="min-w-0">
             <div className="text-lg font-extrabold text-ink truncate">{name}</div>
             <div className="text-[13px] text-muted mt-0.5 font-semibold">
-              {phone ? `+62 ${phone}` : ''}
+              {username ? `@${username}` : ''}
+            </div>
+            <div className="text-[13px] text-muted mt-0.5 font-semibold">
+              {phone || ''}
             </div>
           </div>
         </div>
