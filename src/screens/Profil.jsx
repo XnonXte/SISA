@@ -13,8 +13,7 @@ const maskAccount = (acc) => {
 };
 
 export default function Profil() {
-  const { reset } = useAppNavigation();
-  const { go } = useAppNavigation();
+  const { reset, go } = useAppNavigation();
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
   const { name, username, phone, profilePhoto, wallet, rewardType, ewalletAccount, points, token } = userData;
@@ -40,6 +39,7 @@ export default function Profil() {
     // store.js subscriber sees token === null and calls clearSession()
     dispatch(logout());
     reset();
+    go('login');
   };
 
   return (

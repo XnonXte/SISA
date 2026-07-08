@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 
 import Splash from './screens/Splash';
 import Login from './screens/Login';
+import ForgotPassword from './screens/ForgotPassword';
 import Register from './screens/Register';
 import CompleteProfile from './screens/CompleteProfile';
 import RewardPref from './screens/RewardPref';
@@ -20,6 +21,7 @@ import Keranjang from './screens/Keranjang';
 const SCREENS = {
   splash: Splash,
   login: Login,
+  forgotPassword: ForgotPassword,
   register: Register,
   completeProfile: CompleteProfile,
   rewardPref: RewardPref,

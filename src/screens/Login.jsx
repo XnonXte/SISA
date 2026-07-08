@@ -131,7 +131,7 @@ export default function Login() {
                 <div className="flex justify-end mt-2">
                     <button
                         type="button"
-                        onClick={() => setError('Fitur lupa password akan segera tersedia.')}
+                        onClick={() => go('forgotPassword')}
                         className="text-xs text-placeholder font-medium bg-transparent border-none cursor-pointer hover:text-ink transition-colors"
                     >
                         Lupa Password?

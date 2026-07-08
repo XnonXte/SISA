@@ -92,15 +92,17 @@ export default function CompleteProfile() {
 
         <div className="flex flex-col items-center mb-4 gap-3">
           <div className="text-xs text-placeholder uppercase tracking-[0.24em] font-bold">Foto Profil (Opsional)</div>
-          <label htmlFor="profile-photo" className="cursor-pointer relative w-28 h-28 rounded-full bg-[#EAF5EB] overflow-hidden border border-line flex items-center justify-center">
-            {profilePhoto ? (
-              <img src={profilePhoto} alt="Foto Profil" className="w-full h-full object-cover" />
-            ) : (
-              <div className="text-green-600 text-4xl">
-                <i className="bi bi-person-circle" />
-              </div>
-            )}
-            <div className="absolute bottom-2 right-2 w-9 h-9 rounded-full bg-white border border-line flex items-center justify-center text-green-600 shadow-sm">
+          <label htmlFor="profile-photo" className="cursor-pointer relative overflow-visible">
+            <div className="relative w-28 h-28 rounded-full bg-[#EAF5EB] overflow-hidden border border-line flex items-center justify-center">
+              {profilePhoto ? (
+                <img src={profilePhoto} alt="Foto Profil" className="w-full h-full object-cover" />
+              ) : (
+                <div className="text-green-600 text-4xl">
+                  <i className="bi bi-person-circle" />
+                </div>
+              )}
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-white border border-line flex items-center justify-center text-green-600 shadow-sm">
               <i className="bi bi-camera-fill" />
             </div>
           </label>

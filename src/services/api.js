@@ -122,6 +122,53 @@ export function apiSendOtp({ email }) {
   }));
 }
 
+export function apiSendPasswordResetOtp({ email }) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return Promise.resolve(fail('Email wajib diisi.'));
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return Promise.resolve(fail('Email wajib valid.'));
+  }
+  if (!findUserByEmail(normalizedEmail)) {
+    return Promise.resolve(fail('Email tidak ditemukan.'));
+  }
+
+  return Promise.resolve(ok({
+    otp: '123456',
+    expiresAt: Date.now() + 5 * 60 * 1000,
+  }));
+}
+
+export function apiResetPassword({ email, otp, password }) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return Promise.resolve(fail('Email wajib diisi.'));
+  if (!findUserByEmail(normalizedEmail)) {
+    return Promise.resolve(fail('Email tidak ditemukan.'));
+  }
+  if (otp !== '123456') {
+    return Promise.resolve(fail('OTP salah.'));
+  }
+  if (!password || password.length < 8) {
+    return Promise.resolve(fail('Password minimal 8 karakter.'));
+  }
+  if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+    return Promise.resolve(fail('Password harus mengandung huruf dan angka.'));
+  }
+
+  const users = getUsers();
+  const user = findUserByEmail(normalizedEmail);
+  const updated = {
+    ...user,
+    password: hashPassword(password),
+  };
+
+  users[normalizedEmail] = updated;
+  if (updated.phone) users[updated.phone] = updated;
+  saveUsers(users);
+  clearLoginAttempts(normalizedEmail);
+
+  return Promise.resolve(ok({ email: updated.email }));
+}
+
 export function apiRegister({ name, phone, email, password }) {
   const normalizedEmail = normalizeEmail(email);
   const normalizedPhone = phone?.trim() ?? '';
@@ -203,8 +250,10 @@ export function apiLogin({ email, password }) {
     refreshToken,
     token: accessToken,
     name: updated.name,
+    username: updated.username,
     phone: updated.phone,
     email: updated.email,
+    profilePhoto: updated.profilePhoto,
     wallet: updated.wallet,
     ewalletAccount: updated.ewalletAccount,
     rewardType: updated.rewardType,
