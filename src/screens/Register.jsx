@@ -18,6 +18,7 @@ export default function Register() {
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resendCount, setResendCount] = useState(0);
@@ -115,8 +116,24 @@ export default function Register() {
     go('completeProfile');
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (step === 'email') {
+      await handleSendOtp();
+      return;
+    }
+
+    if (step === 'otp') {
+      handleVerifyOtp();
+      return;
+    }
+
+    await handleRegister();
+  };
+
   return (
-    <div className="flex flex-col h-full bg-surface">
+    <form className="flex flex-col h-full bg-surface" onSubmit={handleSubmit}>
       <div className="w-full h-14 bg-white flex items-center justify-center border-b border-line shrink-0 relative">
         <button
           type="button"
@@ -207,14 +224,25 @@ export default function Register() {
         {step === 'password' && (
           <>
             <div className="text-xs text-placeholder font-medium mb-1">Password</div>
-            <input
-              type="password"
-              placeholder="Min. 8 karakter (A-Z, a-z, 0-9)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input-field"
-              disabled={loading}
-            />
+            <div className="flex h-[52px] rounded-[10px] border border-line bg-white overflow-hidden relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Min. 8 karakter (A-Z, a-z, 0-9)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="flex-1 border-none bg-transparent px-3.5 pr-12 font-sans text-[15px] text-ink outline-none"
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-placeholder hover:text-ink transition-colors"
+                aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                tabIndex={-1}
+              >
+                <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'} text-lg`} />
+              </button>
+            </div>
 
             <div className="text-xs text-placeholder font-medium mt-5 mb-1">Konfirmasi Password</div>
             <input
@@ -238,14 +266,14 @@ export default function Register() {
 
       <div className="p-6">
         {step === 'email' && (
-          <button className="btn-primary" onClick={handleSendOtp} disabled={!canSendOtp || loading}>
+          <button type="submit" className="btn-primary" disabled={!canSendOtp || loading}>
             {loading ? <><i className="bi bi-arrow-repeat animate-spin mr-2" />Mengirim OTP...</> : 'Lanjutkan'}
           </button>
         )}
 
         {step === 'otp' && (
           <div className="flex flex-col gap-3">
-            <button className="btn-primary" onClick={handleVerifyOtp} disabled={loading}>
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? <><i className="bi bi-arrow-repeat animate-spin mr-2" />Memverifikasi...</> : 'Verifikasi OTP'}
             </button>
             <button
@@ -268,11 +296,11 @@ export default function Register() {
         )}
 
         {step === 'password' && (
-          <button className="btn-primary" onClick={handleRegister} disabled={!canCreateAccount || loading}>
+          <button type="submit" className="btn-primary" disabled={!canCreateAccount || loading}>
             {loading ? <><i className="bi bi-arrow-repeat animate-spin mr-2" />Mendaftar...</> : 'Buat Akun'}
           </button>
         )}
       </div>
-    </div>
+    </form>
   );
 }

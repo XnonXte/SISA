@@ -69,8 +69,13 @@ export default function CompleteProfile() {
     go('dashboard');
   };
 
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    await handleSubmit();
+  };
+
   return (
-    <div className="flex flex-col h-full bg-surface">
+    <form className="flex flex-col h-full bg-surface" onSubmit={handleFormSubmit}>
       <div className="w-full h-14 bg-white flex items-center justify-center border-b border-line shrink-0 relative">
         <button
           type="button"
@@ -124,7 +129,7 @@ export default function CompleteProfile() {
           <div className="text-sm font-bold text-ink mb-1">Email</div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-green-600 font-semibold">
-            <input type="email" className="input-field bg-surface-card" value={user.email} disabled />
+              <input type="email" className="input-field bg-surface-card" value={user.email} disabled />
               <i className="bi bi-check-circle-fill" /> Terverifikasi
             </div>
             <div className="text-[12px] text-placeholder">Email tidak dapat diubah</div>
@@ -158,10 +163,10 @@ export default function CompleteProfile() {
       </div>
 
       <div className="p-6">
-        <button className="btn-primary w-full" onClick={handleSubmit} disabled={loading}>
+        <button type="submit" className="btn-primary w-full" disabled={loading}>
           {loading ? <><i className="bi bi-arrow-repeat animate-spin mr-2" />Menyimpan...</> : 'Simpan Profil'}
         </button>
       </div>
-    </div>
+    </form>
   );
 }

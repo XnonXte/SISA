@@ -82,10 +82,28 @@ export default function ForgotPassword() {
     setStep('success');
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (step === 'email') {
+      await handleSendOtp();
+      return;
+    }
+
+    if (step === 'otp') {
+      handleVerifyOtp();
+      return;
+    }
+
+    if (step === 'password') {
+      await handleResetPassword();
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full bg-surface">
+    <form className="flex flex-col h-full bg-surface" onSubmit={handleSubmit}>
       <div className="top-app-bar">
-        <button className="back-btn" onClick={() => back()}>
+        <button type="button" className="back-btn" onClick={() => back()}>
           <i className="bi bi-arrow-left" />
         </button>
         <h2>Lupa Password</h2>
@@ -179,7 +197,7 @@ export default function ForgotPassword() {
 
       <div className="p-6">
         {step === 'email' && (
-          <button className="btn-primary" onClick={handleSendOtp} disabled={!emailValid || loading}>
+          <button type="submit" className="btn-primary" disabled={!emailValid || loading}>
             {loading ? (
               <>
                 <i className="bi bi-arrow-repeat animate-spin mr-2" />
@@ -193,7 +211,7 @@ export default function ForgotPassword() {
 
         {step === 'otp' && (
           <div className="flex flex-col gap-3">
-            <button className="btn-primary" onClick={handleVerifyOtp} disabled={loading}>
+            <button type="submit" className="btn-primary" disabled={loading}>
               Verifikasi OTP
             </button>
             <button
@@ -212,7 +230,7 @@ export default function ForgotPassword() {
         )}
 
         {step === 'password' && (
-          <button className="btn-primary" onClick={handleResetPassword} disabled={!passwordValid || !passwordsMatch || loading}>
+          <button type="submit" className="btn-primary" disabled={!passwordValid || !passwordsMatch || loading}>
             {loading ? (
               <>
                 <i className="bi bi-arrow-repeat animate-spin mr-2" />
@@ -225,11 +243,11 @@ export default function ForgotPassword() {
         )}
 
         {step === 'success' && (
-          <button className="btn-primary" onClick={() => go('login')}>
+          <button type="button" className="btn-primary" onClick={() => go('login')}>
             Kembali ke Login
           </button>
         )}
       </div>
-    </div>
+    </form>
   );
 }

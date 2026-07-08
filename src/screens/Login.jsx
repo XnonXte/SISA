@@ -70,7 +70,7 @@ export default function Login() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-surface">
+        <form className="flex flex-col h-full bg-surface" onSubmit={handleSubmit}>
             <div className="top-app-bar">
                 <h2>Masuk ke Akun</h2>
             </div>
@@ -162,8 +162,8 @@ export default function Login() {
             {/* Bottom Sticky Action Button */}
             <div className="p-6">
                 <button
+                    type="submit"
                     className="btn-primary"
-                    onClick={handleSubmit}
                     disabled={!canSubmit}
                 >
                     {loading ? (
@@ -176,6 +176,6 @@ export default function Login() {
                     )}
                 </button>
             </div>
-        </div>
+        </form>
     );
 }
