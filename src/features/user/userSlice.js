@@ -5,10 +5,15 @@ export const initialState = {
   // Auth
   userId: null,
   token: null,
+  accessToken: null,
+  refreshToken: null,
 
   // Profile
   name: '',
+  username: '',
+  email: '',
   phone: '',
+  profilePhoto: '',
   wallet: null,
   ewalletAccount: '',
   rewardType: null, // 'ewallet' | 'listrik'
@@ -34,11 +39,29 @@ const userSlice = createSlice({
   reducers: {
     // Called after successful login API response
     loginSuccess: (state, action) => {
-      const { userId, token, name, phone, wallet, ewalletAccount, rewardType, points, milestone } = action.payload;
+      const {
+        userId,
+        token,
+        accessToken,
+        refreshToken,
+        name,
+        email,
+        phone,
+        wallet,
+        ewalletAccount,
+        rewardType,
+        points,
+        milestone,
+      } = action.payload;
       state.userId = userId;
-      state.token = token;
+      state.accessToken = accessToken ?? token ?? null;
+      state.refreshToken = refreshToken ?? null;
+      state.token = accessToken ?? token ?? null;
       state.name = name ?? '';
+      state.username = action.payload.username ?? '';
+      state.email = email ?? '';
       state.phone = phone ?? '';
+      state.profilePhoto = action.payload.profilePhoto ?? '';
       state.wallet = wallet ?? null;
       state.ewalletAccount = ewalletAccount ?? '';
       state.rewardType = rewardType ?? null;
@@ -48,9 +71,12 @@ const userSlice = createSlice({
 
     // Register.jsx — handleSubmit
     setProfile: (state, action) => {
-      const { name, phone } = action.payload;
+      const { name, phone, email, username, profilePhoto } = action.payload;
       if (name?.trim()) state.name = name.trim();
+      if (username?.trim()) state.username = username.trim();
       if (phone) state.phone = phone;
+      if (profilePhoto) state.profilePhoto = profilePhoto;
+      if (email?.trim()) state.email = email.trim().toLowerCase();
     },
 
     // RewardPref.jsx — handleConfirm
