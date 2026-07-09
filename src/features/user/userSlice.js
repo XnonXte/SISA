@@ -108,6 +108,7 @@ const userSlice = createSlice({
           category: item.category,
           icon: item.icon,
           estimatedPoints: item.estimatedPoints,
+          estimatedWeightKg: item.estimatedWeightKg ?? null,
           daysInCart: item.daysInCart ?? 0,
         },
       }),

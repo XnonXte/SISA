@@ -169,17 +169,26 @@
 
   /* Desain Asimetris Tombol Scan Utama di Navbar */
   .nav-scan-btn {
-    @apply border-none flex items-center justify-center text-[13px] font-extrabold text-white cursor-pointer transition-all;
-    width: 56px;
-    height: 56px;
-    border-radius: 0% 50% 0% 50%;
-    background: #1DB954;
-    letter-spacing: 0.5px;
+    @apply border-none flex items-center justify-center text-white cursor-pointer transition-all;
+    width: 58px;
+    height: 58px;
+    border-radius: 9999px;
+    background: linear-gradient(180deg, #28c05f 0%, #169646 100%);
     box-shadow: 0 4px 16px rgba(29, 185, 84, 0.35);
-    transform: translateY(-14px);
+    transform: translateY(-10px);
   }
 
   .nav-scan-btn:active {
-    @apply scale-95 bg-[#179443];
+    @apply scale-95;
+  }
+
+  .nav-scan-icon {
+    width: 26px;
+    height: 26px;
+    display: block;
+  }
+
+  .nav-scan-label {
+    @apply mt-1 text-[10px] font-extrabold tracking-wide text-primary;
   }
 }

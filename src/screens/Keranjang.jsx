@@ -4,6 +4,8 @@ import { useAppNavigation } from '../app/useAppNavigation';
 import { setPickupDraft, removeFromCart } from '../features/user/userSlice';
 import BottomNav from '../components/BottomNav';
 
+const MIN_PICKUP_WEIGHT_KG = 2;
+
 // PENENTU IKON DINAMIS: Memastikan Cardboard & Plastic selalu mendapatkan ikon yang benar
 function getIcon(name) {
   if (!name) return 'bi-recycle';
@@ -13,6 +15,20 @@ function getIcon(name) {
   if (lower === 'plastic') return 'bi-recycle';    // Ikon Daur Ulang Plastik
 
   return 'bi-recycle';
+}
+
+function getEstimatedWeightKg(item) {
+  const fromItem = Number(item?.estimatedWeightKg);
+  if (Number.isFinite(fromItem) && fromItem > 0) return fromItem;
+
+  const label = `${item?.name ?? ''} ${item?.category ?? ''}`.toLowerCase();
+  if (label.includes('cardboard') || label.includes('kardus')) return 0.9;
+  if (label.includes('plastic') || label.includes('plastik')) return 0.7;
+  if (label.includes('glass') || label.includes('kaca')) return 1.1;
+  if (label.includes('metal') || label.includes('logam')) return 1.2;
+
+  const fallback = Number(((Number(item?.estimatedPoints) || 100) / 125).toFixed(1));
+  return Math.max(0.5, fallback);
 }
 
 export default function Keranjang() {
@@ -36,7 +52,8 @@ export default function Keranjang() {
     [cartItems, checked]
   );
   const totalPoints = selectedItems.reduce((sum, item) => sum + item.estimatedPoints, 0);
-  const canRequest = selectedItems.length > 0;
+  const totalWeightKg = selectedItems.reduce((sum, item) => sum + getEstimatedWeightKg(item), 0);
+  const canRequest = selectedItems.length > 0 && totalWeightKg >= MIN_PICKUP_WEIGHT_KG;
 
   const handleRequestPickup = () => {
     const selectedIds = selectedItems.map((item) => item.id);
@@ -121,6 +138,15 @@ export default function Keranjang() {
               </span>
               <span className="text-xl font-extrabold text-ink">~{totalPoints} Poin</span>
             </div>
+            <div className="mb-4 flex items-center justify-between rounded-geo-sm border border-line bg-surface px-3 py-2 text-xs font-semibold text-muted">
+              <span>Estimasi berat</span>
+              <span className="text-ink">{totalWeightKg.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} kg</span>
+            </div>
+            {!canRequest && (
+              <div className="mb-3 text-[12px] font-semibold text-placeholder">
+                Request Pickup aktif setelah total estimasi mencapai minimal {MIN_PICKUP_WEIGHT_KG} kg.
+              </div>
+            )}
             <button className="btn-primary" onClick={handleRequestPickup} disabled={!canRequest}>
               Request Pickup untuk Item Terpilih
             </button>
