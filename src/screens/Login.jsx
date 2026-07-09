@@ -42,7 +42,10 @@ export default function Login() {
         return () => clearInterval(interval);
     }, [email]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        // Intercepts the HTML browser refresh behavior
+        e.preventDefault();
+
         if (!canSubmit) return;
 
         setError(null);
