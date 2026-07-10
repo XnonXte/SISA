@@ -17,6 +17,8 @@ import TukarPoin from './screens/TukarPoin';
 import Konfirmasi from './screens/Konfirmasi';
 import Profil from './screens/Profil';
 import Keranjang from './screens/Keranjang';
+import PusatBantuan from './screens/PusatBantuan';
+import TentangSisa from './screens/TentangSisa';
 
 const SCREENS = {
   splash: Splash,
@@ -35,6 +37,8 @@ const SCREENS = {
   konfirmasi: Konfirmasi,
   profil: Profil,
   keranjang: Keranjang,
+  pusatBantuan: PusatBantuan,
+  tentangSisa: TentangSisa,
 };
 
 export default function App() {

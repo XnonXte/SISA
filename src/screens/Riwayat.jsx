@@ -50,7 +50,11 @@ function PointsLabel({ item }) {
 function EmptyState({ go }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center text-center px-8">
-      <i className="bi bi-inbox text-[56px] text-[#BDBDBD]" />
+      <img
+        src="/assets/Asset%206.png"
+        alt="Ilustrasi riwayat kosong"
+        className="h-28 w-28 object-contain sm:h-36 sm:w-36"
+      />
       <div className="text-base font-extrabold text-ink mt-4">Belum Ada Riwayat</div>
       <div className="text-[13px] text-placeholder mt-1.5 leading-relaxed">
         Riwayat pickup sampahmu akan muncul di sini setelah kamu melakukan scan pertama.

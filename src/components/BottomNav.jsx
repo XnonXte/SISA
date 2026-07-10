@@ -19,14 +19,18 @@ export default function BottomNav({ active }) {
       {TABS.map((tab) => {
         if (tab.isScan) {
           return (
-            <div key={tab.key} className="flex items-center justify-center">
+            <div key={tab.key} className="flex h-full flex-col items-center justify-center">
               <button
                 onClick={() => go(tab.screen)}
                 aria-label="Scan Sampah"
                 className="nav-scan-btn"
               >
-                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>SCAN</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-scan-icon">
+                  <path d="M7 3H4a1 1 0 0 0-1 1v3h2V5h2V3zm13 0h-3v2h2v2h2V4a1 1 0 0 0-1-1zM7 21H4a1 1 0 0 1-1-1v-3h2v2h2v2zm13-4v3a1 1 0 0 1-1 1h-3v-2h2v-2h2zM7 12h10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M10 8l6 4-6 4V8z" fill="currentColor" />
+                </svg>
               </button>
+              <span className="nav-scan-label">Scan</span>
             </div>
           );
         }

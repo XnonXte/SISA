@@ -3,6 +3,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useAppNavigation } from '../app/useAppNavigation';
 import { addToCart, setPickupDraft, clearScanResult } from '../features/user/userSlice';
 
+function estimateWeightKg(category, estimatedPoints) {
+  const label = `${category ?? ''}`.toLowerCase();
+
+  if (label.includes('cardboard') || label.includes('kardus')) return 0.9;
+  if (label.includes('plastic') || label.includes('plastik')) return 0.7;
+  if (label.includes('glass') || label.includes('kaca')) return 1.1;
+  if (label.includes('metal') || label.includes('logam')) return 1.2;
+
+  const fallback = Number(((Number(estimatedPoints) || 100) / 125).toFixed(1));
+  return Math.max(0.5, fallback);
+}
+
 export default function HasilScan() {
   const { go } = useAppNavigation();
   const dispatch = useDispatch();
@@ -35,6 +47,7 @@ export default function HasilScan() {
     category,
     icon,
     estimatedPoints,
+    estimatedWeightKg: estimateWeightKg(category, estimatedPoints),
     daysInCart: 0,
   };
 
