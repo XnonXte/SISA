@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { useAppNavigation } from '../app/useAppNavigation';
 import BottomNav from '../components/BottomNav';
+import TopBoard from '../components/TopBoard';
 
 const MIN_PICKUP_WEIGHT_KG = 2;
 
@@ -90,7 +91,6 @@ export default function Dashboard() {
   const pendingPoints = historyItems
     .filter((item) => item?.status === 'DALAM_PROSES' || item?.status === 'DIJADWALKAN')
     .reduce((sum, item) => sum + (item.estimatedPoints || 0), 0);
-  const notificationCount = (activePickup || pendingPoints > 0 || cartItems.length > 0) ? 1 : 0;
 
   const quickActions = [
     { label: 'Scan Sampah', icon: 'bi-camera', action: 'kamera', description: 'Pindai & simpan' },
@@ -99,10 +99,30 @@ export default function Dashboard() {
   ];
 
   const educationCards = [
-    { title: 'Cara mempersiapkan sampah plastik', icon: 'bi-droplet-half', accent: 'from-primary/15 to-primary/5' },
-    { title: 'Kenali jenis-jenis sampah kertas', icon: 'bi-box-seam', accent: 'from-accent/20 to-accent/5' },
-    { title: 'Sampah logam juga bisa bernilai!', icon: 'bi-nut', accent: 'from-[#D7E8F8] to-[#EEF5FF]' },
-    { title: 'Dampak positif daur ulang', icon: 'bi-recycle', accent: 'from-[#DDF5E5] to-[#F4FBF5]' },
+    {
+      title: 'Cara mempersiapkan sampah plastik',
+      icon: 'bi-droplet-half',
+      accent: 'from-primary/15 to-primary/5',
+      href: 'https://program.sampoernaacademy.sch.id/id/artikel-id/cara-daur-ulang-sampah-plastik-dan-manfaat-bagi-lingkungan/',
+    },
+    {
+      title: 'Kenali jenis-jenis sampah kertas',
+      icon: 'bi-box-seam',
+      accent: 'from-accent/20 to-accent/5',
+      href: 'https://www.antaranews.com/berita/5443530/sampah-kertas-di-indonesia-daur-ulang-menjadi-solusi-ramah-lingkungan',
+    },
+    {
+      title: 'Sampah logam juga bisa bernilai!',
+      icon: 'bi-nut',
+      accent: 'from-[#D7E8F8] to-[#EEF5FF]',
+      href: 'https://www.antaranews.com/berita/4790541/pengertian-daur-ulang-sampah-dan-ragam-manfaatnya',
+    },
+    {
+      title: 'Dampak positif daur ulang',
+      icon: 'bi-recycle',
+      accent: 'from-[#DDF5E5] to-[#F4FBF5]',
+      href: 'https://www.antaranews.com/berita/4790541/pengertian-daur-ulang-sampah-dan-ragam-manfaatnya',
+    },
   ];
 
   const avatarSrc = getAvatarSrc(name, profilePhoto);
@@ -111,47 +131,14 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-[radial-gradient(circle_at_top_left,_rgba(29,185,84,0.10),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(245,166,35,0.10),_transparent_26%),linear-gradient(180deg,_#FBFCFB_0%,_#F7FAF7_100%)] relative overflow-hidden">
-      <header className="shrink-0 border-b border-line/70 bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-            <button
-              type="button"
-              onClick={() => go('profil')}
-              className="relative h-12 w-12 overflow-hidden rounded-full border border-line bg-white shadow-sm shrink-0"
-              aria-label="Buka profil"
-            >
-              <img src={avatarSrc} alt={name || 'Avatar pengguna'} className="h-full w-full object-cover" />
-            </button>
-            <div className="min-w-0 pr-2">
-              <div className="text-[9px] font-bold uppercase tracking-[0.22em] text-placeholder sm:text-[11px]">Selamat datang kembali,</div>
-              <div className="max-w-[180px] whitespace-nowrap text-[14px] font-extrabold leading-none text-ink sm:max-w-none sm:text-[22px] sm:leading-none">
-                Hai, {firstName}! <span className="text-primary">👋</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              className="relative flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink shadow-sm transition-transform active:scale-95"
-              aria-label="Notifikasi"
-            >
-              <i className="bi bi-bell text-xl" />
-              {notificationCount > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-danger" />}
-            </button>
-            <button
-              type="button"
-              onClick={() => go('tukarPoin')}
-              className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary-tint px-3.5 py-2 text-sm font-extrabold text-primary shadow-sm transition-transform active:scale-95"
-            >
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white">
-                <i className="bi bi-coin" />
-              </span>
-              <span>{formatPointValue(points)} PT</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <TopBoard
+        avatarSrc={avatarSrc}
+        name={name}
+        firstName={firstName}
+        points={points}
+        onProfile={() => go('profil')}
+        onPoints={() => go('tukarPoin')}
+      />
 
       <div className="scroll-content">
         <div className="mx-auto w-full max-w-7xl px-4 py-4 pb-[112px] sm:px-6 lg:px-8">
@@ -198,25 +185,11 @@ export default function Dashboard() {
                       Detail Saldo &gt;
                     </button>
                     <div className="hidden h-24 w-24 items-center justify-center sm:flex sm:h-28 sm:w-28">
-                      <svg viewBox="0 0 200 200" className="h-full w-full">
-                        <defs>
-                          <radialGradient id="balanceEarthGrad" cx="35%" cy="30%" r="65%">
-                            <stop offset="0%" stopColor="#BAE6FD" />
-                            <stop offset="40%" stopColor="#38BDF8" />
-                            <stop offset="85%" stopColor="#0284C7" />
-                            <stop offset="100%" stopColor="#0369A1" />
-                          </radialGradient>
-                        </defs>
-                        <circle cx="100" cy="100" r="72" fill="url(#balanceEarthGrad)" filter="drop-shadow(0px 6px 12px rgba(0,0,0,0.15))" />
-                        <path d="M55 70 Q70 50 90 65 T145 60 T150 95 Q125 115 105 100 T55 70 Z" fill="#4ADE80" opacity="0.95" />
-                        <path d="M50 120 Q75 105 90 125 T135 135 T120 160 Q75 165 50 140 Z" fill="#22C55E" />
-                        <rect x="72" y="44" width="4" height="10" fill="#78350F" rx="1" />
-                        <circle cx="74" cy="40" r="9" fill="#15803D" />
-                        <rect x="122" y="54" width="4" height="12" fill="#78350F" rx="1" />
-                        <circle cx="124" cy="48" r="11" fill="#166534" />
-                        <rect x="92" y="112" width="3.5" height="10" fill="#78350F" rx="1" />
-                        <ellipse cx="94" cy="106" rx="8" ry="9" fill="#16A34A" />
-                      </svg>
+                      <img
+                        src="/assets/Asset%205.png"
+                        alt="Ilustrasi akumulasi saldo"
+                        className="h-full w-full object-contain"
+                      />
                     </div>
                   </div>
                 </div>
@@ -307,36 +280,26 @@ export default function Dashboard() {
                 </div>
 
                 <div className="overflow-hidden rounded-geo-xl border border-line bg-[linear-gradient(135deg,_#0E7C3A_0%,_#2EA44F_42%,_#6AD17E_100%)] p-4 text-white shadow-card sm:p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="max-w-[68%]">
-                      <div className="mt-1 text-[16px] font-extrabold leading-tight sm:mt-0 sm:text-[22px]">
+                  <div className="flex items-end justify-between gap-4">
+                    <div className="max-w-[68%] pb-1 sm:pb-2">
+                      <div className="mt-1 text-[13px] font-extrabold leading-snug sm:mt-0 sm:text-[18px]">
                         Setiap sampah yang kamu pilah, bumi jadi lebih baik.
                       </div>
-                      <button
-                        type="button"
-                        className="mt-4 rounded-full bg-white px-3.5 py-2 text-[12px] font-extrabold text-primary shadow-sm"
+                      <a
+                        href="https://kemenlh.go.id/news/detail/bukan-sekadar-daur-ulang-jurus-indonesia-kelola-sampah-plastik-e-waste"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 inline-flex items-center rounded-full bg-white px-3.5 py-2 text-[11px] font-extrabold text-primary shadow-sm sm:mt-4 sm:text-[12px]"
                       >
                         Pelajari lebih lanjut <i className="bi bi-arrow-right" />
-                      </button>
+                      </a>
                     </div>
-                    <div className="relative h-24 w-24 shrink-0 sm:h-28 sm:w-28 flex items-center justify-center">
-                      <svg viewBox="0 0 200 200" className="h-full w-full">
-                        <defs>
-                          <radialGradient id="earthGrad" cx="35%" cy="30%" r="65%">
-                            <stop offset="0%" stopColor="#A3E6FD" />
-                            <stop offset="25%" stopColor="#38BDF8" />
-                            <stop offset="75%" stopColor="#0284C7" />
-                            <stop offset="100%" stopColor="#0369A1" />
-                          </radialGradient>
-                        </defs>
-                        <circle cx="100" cy="100" r="75" fill="url(#earthGrad)" filter="drop-shadow(0px 8px 16px rgba(0,0,0,0.2))" />
-                        <path d="M60 65 Q75 50 95 60 T140 55 T155 85 Q130 110 110 95 T60 65 Z" fill="#4ADE80" opacity="0.9" />
-                        <path d="M45 110 Q70 100 85 120 T130 130 T120 160 Q70 165 45 135 Z" fill="#22C55E" opacity="0.85" />
-                        <path d="M115 40 Q130 25 150 35 T160 60 Z" fill="#4ADE80" opacity="0.75" />
-                        <path d="M25 90 C 20 40, 180 40, 175 90" fill="none" stroke="#65A30D" strokeWidth="3" strokeDasharray="6 4" opacity="0.6" />
-                        <path d="M35 125 L47 115 L53 128 Z" fill="#A3E635" transform="rotate(25 35 125)" />
-                        <path d="M165 75 L177 65 L183 78 Z" fill="#A3E635" transform="rotate(-15 165 75)" />
-                      </svg>
+                    <div className="relative flex h-28 w-28 shrink-0 items-end justify-end sm:h-36 sm:w-36">
+                      <img
+                        src="/assets/Asset%204.png"
+                        alt="Ilustrasi bumi dan sampah terpilah"
+                        className="h-full w-full object-contain object-right-bottom translate-y-2 sm:translate-y-3"
+                      />
                     </div>
                   </div>
                 </div>
@@ -449,9 +412,11 @@ export default function Dashboard() {
 
                 <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {educationCards.map((card) => (
-                    <button
+                    <a
                       key={card.title}
-                      type="button"
+                      href={card.href}
+                      target="_blank"
+                      rel="noreferrer"
                       className={`group rounded-geo-sm border border-line bg-gradient-to-br ${card.accent} p-3 text-left shadow-sm transition-transform hover:-translate-y-0.5 active:scale-[0.99]`}
                     >
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/90 text-primary shadow-sm">
@@ -459,7 +424,7 @@ export default function Dashboard() {
                       </div>
                       <div className="mt-3 text-[13px] font-extrabold leading-snug text-ink sm:text-[14px]">{card.title}</div>
                       <div className="mt-2 text-[11px] font-bold text-primary">Baca artikel</div>
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>

@@ -189,6 +189,6 @@
   }
 
   .nav-scan-label {
-    @apply mt-1 text-[10px] font-extrabold tracking-wide text-primary;
+    @apply -mt-0.5 text-[10px] font-extrabold tracking-wide text-primary;
   }
 }

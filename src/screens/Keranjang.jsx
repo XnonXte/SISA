@@ -79,7 +79,11 @@ export default function Keranjang() {
 
       {cartItems.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-8">
-          <i className="bi bi-basket2 text-[56px] text-[#BDBDBD]" />
+          <img
+            src="/assets/Asset%2010.png"
+            alt="Ilustrasi keranjang kosong"
+            className="h-28 w-28 object-contain sm:h-36 sm:w-36"
+          />
           <div className="text-base font-extrabold text-ink mt-4">Keranjang Kamu Masih Kosong</div>
           <div className="text-[13px] text-placeholder mt-1.5 leading-relaxed">
             Mulai scan sampah pertamamu!
