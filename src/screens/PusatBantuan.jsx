@@ -41,7 +41,7 @@ export default function PusatBantuan() {
                 <i className="bi bi-bug text-xl text-accent" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-extrabold text-ink">Report a bug</div>
+                <div className="text-sm font-extrabold text-ink">Laporkan masalah</div>
                 <div className="text-xs text-muted mt-1 break-all">{BUG_REPORT_URL}</div>
               </div>
               <i className="bi bi-box-arrow-up-right text-placeholder text-sm mt-1" />
@@ -57,7 +57,7 @@ export default function PusatBantuan() {
                 <i className="bi bi-envelope text-xl text-ink" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-extrabold text-ink">Email the developer</div>
+                <div className="text-sm font-extrabold text-ink">Email developer</div>
                 <div className="text-xs text-muted mt-1 break-all">{DEVELOPER_EMAIL}</div>
               </div>
               <i className="bi bi-box-arrow-up-right text-placeholder text-sm mt-1" />
