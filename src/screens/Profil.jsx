@@ -28,8 +28,8 @@ export default function Profil() {
 
   const menuItems = [
     { label: 'Riwayat Transaksi', icon: 'bi-clock-history', action: () => go('riwayat') },
-    { label: 'Pusat Bantuan', icon: 'bi-question-circle', action: null },
-    { label: 'Tentang SISA', icon: 'bi-info-circle', action: null },
+    { label: 'Pusat Bantuan', icon: 'bi-question-circle', action: () => go('pusatBantuan') },
+    { label: 'Tentang SISA', icon: 'bi-info-circle', action: () => go('tentangSisa') },
   ];
 
   const handleLogout = async () => {
