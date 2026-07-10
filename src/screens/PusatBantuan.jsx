@@ -8,7 +8,7 @@ export default function PusatBantuan() {
   const { go } = useAppNavigation();
 
   return (
-    <div className="flex flex-col h-screen bg-surface">
+    <div className="flex flex-col h-screen min-h-0 bg-surface">
       <div className="top-app-bar">
         <button className="back-btn" onClick={() => go('profil')}>
           <i className="bi bi-arrow-left" />
@@ -16,7 +16,7 @@ export default function PusatBantuan() {
         <h2>Pusat Bantuan</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-8 pb-8">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-8 pb-8">
         <div className="flex justify-start mb-6">
           <img
             src="/assets/Asset 1.png"
