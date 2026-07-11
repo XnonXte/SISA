@@ -6,6 +6,17 @@ import { apiLogin, getLoginLockoutStatus } from '../services/api';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const GUEST_USER = {
+    userId: 'guest',
+    token: 'guest-token',
+    accessToken: 'guest-token',
+    name: 'Guest',
+    username: 'guest',
+    phone: '+62895322108177',
+    points: 0,
+    milestone: 1000,
+};
+
 export default function Login() {
     const { go } = useAppNavigation();
     const dispatch = useDispatch();
@@ -69,6 +80,11 @@ export default function Login() {
         }
 
         dispatch(loginSuccess(data));
+        go('dashboard');
+    };
+
+    const handleGuestLogin = () => {
+        dispatch(loginSuccess(GUEST_USER));
         go('dashboard');
     };
 
@@ -163,7 +179,7 @@ export default function Login() {
             </div>
 
             {/* Bottom Sticky Action Button */}
-            <div className="p-6">
+            <div className="p-6 space-y-3">
                 <button
                     type="submit"
                     className="btn-primary"
@@ -177,6 +193,14 @@ export default function Login() {
                     ) : (
                         'Masuk'
                     )}
+                </button>
+                <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={handleGuestLogin}
+                    disabled={loading}
+                >
+                    Gunakan Guest Account
                 </button>
             </div>
         </form>
