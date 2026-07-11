@@ -32,6 +32,25 @@ export default function KameraMobileView({ controller, onGoDashboard }) {
     handlePickFromStorage,
   } = controller;
 
+  // Attempt to trigger prompt, guide user if browser has hard-blocked it
+  const handleRequestPermission = async () => {
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Try requesting access to trigger the native prompt
+        await navigator.mediaDevices.getUserMedia({ video: true });
+        window.location.reload();
+      } else {
+        window.location.reload();
+      }
+    } catch (err) {
+      // If code execution lands here, the browser actively blocked the prompt.
+      // We must instruct the user to unblock it via the browser UI.
+      alert(
+        "Izin kamera diblokir oleh browser. Silakan klik ikon kamera/gembok di sebelah kiri alamat URL Anda untuk mengubah izin menjadi 'Izinkan' atau 'Allow'."
+      );
+    }
+  };
+
   return (
     <div className="relative flex h-screen flex-col overflow-hidden bg-black text-white">
       {!cameraError && !scanSuccess && !scanError && (
@@ -62,24 +81,24 @@ export default function KameraMobileView({ controller, onGoDashboard }) {
       />
 
       {permissionDenied && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 px-6 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-geo-2xl border border-white/10 bg-neutral-900 p-7 text-center shadow-2xl">
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-danger/15">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white px-6">
+          <div className="w-full max-w-sm rounded-geo-2xl border border-neutral-100 bg-white p-7 text-center shadow-2xl">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-danger/10">
               <i className="bi bi-camera-video-off text-3xl text-danger" />
             </div>
-            <h2 className="text-xl font-bold text-white">Izin Kamera Diperlukan</h2>
-            <p className="mt-3 px-2 text-sm leading-6 text-white/70">
+            <h2 className="text-xl font-bold text-neutral-900">Izin Kamera Diperlukan</h2>
+            <p className="mt-3 px-2 text-sm leading-6 text-neutral-500">
               SISA memerlukan akses kamera untuk melakukan identifikasi sampah. Silakan aktifkan izin kamera dari pengaturan browser Anda.
             </p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={handleRequestPermission}
               className="mt-6 w-full rounded-geo-md bg-primary py-3 font-bold text-ink transition hover:brightness-105"
             >
               Izinkan Kamera
             </button>
             <button
               onClick={onGoDashboard}
-              className="mt-3 w-full py-2 text-sm font-semibold text-white/60 hover:text-white"
+              className="mt-3 w-full py-2 text-sm font-semibold text-neutral-400 hover:text-neutral-600"
             >
               Nanti
             </button>
@@ -240,7 +259,7 @@ export default function KameraMobileView({ controller, onGoDashboard }) {
               )}
             </div>
 
-            {cameraReady && !scanning && (
+            {!scanning && (
               <div className="mt-8 max-w-xs rounded-xl border border-white/10 bg-black/60 px-5 py-3 text-center text-sm font-medium text-white/95 shadow-lg backdrop-blur-md">
                 Pastikan hanya satu jenis material berada di dalam area scan.
               </div>
