@@ -12,7 +12,7 @@ const GUEST_USER = {
     accessToken: 'guest-token',
     name: 'Guest',
     username: 'guest',
-    phone: '+62895322108177',
+    phone: '+628123456789',
     points: 0,
     milestone: 1000,
 };
