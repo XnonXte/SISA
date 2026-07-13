@@ -325,16 +325,105 @@ export function apiUpdateProfile({ email, name, username, phone, profilePhoto })
 
 // ── Trash Scanning ───────────────────────────────────────────────────────────
 
+const MATERIAL_DB = {
+  Plastic: {
+    displayName: 'PET Bening',
+    subtype: 'Botol PET',
+    icon: 'bi-recycle',
+    recycleCategory: 'Daur Ulang',
+    prices: { 'Grade A': 2500, 'Grade B': 2000 },
+    recommendation: 'Lepaskan tutup dan label botol agar peluang mendapatkan Grade A lebih tinggi.',
+  },
+  Cardboard: {
+    displayName: 'Kardus',
+    subtype: 'Kardus Bekas',
+    icon: 'bi-box-seam',
+    recycleCategory: 'Daur Ulang',
+    prices: { 'Grade A': 1500, 'Grade B': 1000 },
+    recommendation: 'Pastikan kardus kering dan tidak basah agar tetap Grade A.',
+  },
+};
+
+export const WEIGHT_RANGES = {
+  sedikit: { id: 'sedikit', label: 'Sedikit', range: '< 1 kg', minKg: 0, maxKg: 1, boxes: 1 },
+  sedang: { id: 'sedang', label: 'Sedang', range: '1–2 kg', minKg: 1, maxKg: 2, boxes: 2 },
+  banyak: { id: 'banyak', label: 'Banyak', range: '2–5 kg', minKg: 2, maxKg: 5, boxes: 3, minimumPickup: true },
+  sangat_banyak: { id: 'sangat_banyak', label: 'Sangat Banyak', range: '> 5 kg', minKg: 5, maxKg: 7, boxes: 4 },
+};
+
+function getReferenceWeightKg(rangeInfo) {
+  return (rangeInfo.minKg + rangeInfo.maxKg) / 2;
+}
+
+function getMaterialPrice(category, grade) {
+  const info = MATERIAL_DB[category];
+  if (!info) return 0;
+  return info.prices[grade] ?? info.prices['Grade B'] ?? 0;
+}
+
+export function calculateRangeEstimate(category, grade, weightRangeId) {
+  const materialInfo = MATERIAL_DB[category];
+  const rangeInfo = WEIGHT_RANGES[weightRangeId];
+  if (!materialInfo || !rangeInfo) return null;
+
+  const materialPrice = getMaterialPrice(category, grade);
+  const estimatedWeight = getReferenceWeightKg(rangeInfo);
+  const estimatedPrice = Math.round(materialPrice * estimatedWeight);
+  const estimatedPoints = Math.round(estimatedPrice / 10);
+  const pickupEligible = weightRangeId === 'banyak' || weightRangeId === 'sangat_banyak';
+
+  return {
+    materialPrice,
+    estimatedWeight,
+    estimatedPrice,
+    estimatedPoints,
+    pickupEligible,
+  };
+}
+
+export function apiCalculateScanEstimate({ category, grade, weightRange }) {
+  const result = calculateRangeEstimate(category, grade, weightRange);
+  if (!result) {
+    if (!MATERIAL_DB[category]) return Promise.resolve(fail('Material tidak dikenali.'));
+    return Promise.resolve(fail('Weight range tidak valid.'));
+  }
+
+  return Promise.resolve(ok(result));
+}
+
 export async function apiScanImage(_token, imageBase64) {
- const blob=await (await fetch(imageBase64)).blob();
- const fd=new FormData(); fd.append('file',blob,'scan.jpg');
- const r=await fetch(`${import.meta.env.VITE_API_URL}/classify-waste`,{method:'POST',body:fd});
- if(!r.ok) return fail('Scan gagal');
- const j=await r.json();
- const accepted=['Plastic','Cardboard'].includes(j.primary_material);
- const grade=j.sub_classification||'-';
- const points=grade==='Grade A'?150:grade==='Grade B'?100:0;
- return ok({category:j.primary_material,estimatedPoints:points,confidence:parseFloat(j.primary_accuracy)/100,grade,status:accepted?'accepted':'rejected',anomalies:[],instruction:''});
+  const blob = await (await fetch(imageBase64)).blob();
+  const fd = new FormData();
+  fd.append('file', blob, 'scan.jpg');
+  const r = await fetch(`${import.meta.env.VITE_API_URL}/classify-waste`, { method: 'POST', body: fd });
+  if (!r.ok) return fail('Material tidak dapat dikenali.');
+  const j = await r.json();
+
+  const category = j.primary_material;
+  const materialInfo = MATERIAL_DB[category];
+  if (!materialInfo) {
+    return fail('Material tidak dapat dikenali.');
+  }
+
+  const accepted = ['Plastic', 'Cardboard'].includes(category);
+  const grade = j.sub_classification || 'Grade B';
+  const confidence = parseFloat(j.primary_accuracy) / 100;
+
+  return ok({
+    scanId: `scan_${Date.now()}`,
+    category,
+    material: materialInfo.displayName,
+    subtype: materialInfo.subtype,
+    grade,
+    confidence,
+    status: accepted ? 'accepted' : 'rejected',
+    recycleCategory: materialInfo.recycleCategory,
+    recommendation: materialInfo.recommendation,
+    icon: materialInfo.icon,
+    materialPrice: getMaterialPrice(category, grade),
+    anomalies: [],
+    instruction: materialInfo.recommendation,
+  });
 }
 
 // ── Cart / Pickup ─────────────────────────────────────────────────────────────

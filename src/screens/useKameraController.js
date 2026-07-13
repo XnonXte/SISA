@@ -122,11 +122,17 @@ export function useKameraController({ dispatch, token, go }) {
         dispatch(
           setScanResult({
             imageBase64,
+            scanId: data.scanId,
             category: data.category,
-            estimatedPoints: data.estimatedPoints,
+            material: data.material,
+            subtype: data.subtype,
             confidence: data.confidence,
             grade: data.grade,
             status: data.status,
+            recycleCategory: data.recycleCategory,
+            recommendation: data.recommendation,
+            icon: data.icon,
+            materialPrice: data.materialPrice,
             anomalies: data.anomalies ?? [],
             instruction: data.instruction,
           })
@@ -137,9 +143,10 @@ export function useKameraController({ dispatch, token, go }) {
         setScanning(false);
         setScanSuccess(true);
 
+        // Durasi diubah dari 2000 menjadi 1000 (1 detik)
         setTimeout(() => {
           go('hasilScan');
-        }, 2000);
+        }, 1000);
       } catch {
         setScanning(false);
         setScanError('Gagal memproses gambar. Silakan coba kembali.');

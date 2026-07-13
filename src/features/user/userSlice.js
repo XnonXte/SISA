@@ -105,10 +105,14 @@ const userSlice = createSlice({
       prepare: (item) => ({
         payload: {
           id: item.id || `item_${nanoid()}`,
+          name: item.name ?? item.material ?? item.category,
           category: item.category,
+          grade: item.grade ?? null,
+          weightRange: item.weightRange ?? null,
           icon: item.icon,
           estimatedPoints: item.estimatedPoints,
           estimatedWeightKg: item.estimatedWeightKg ?? null,
+          estimatedPrice: item.estimatedPrice ?? null,
           daysInCart: item.daysInCart ?? 0,
         },
       }),
