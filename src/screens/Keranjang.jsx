@@ -68,7 +68,6 @@ export default function Keranjang() {
   const handleRequestPickup = () => {
     if (!canRequest) return;
     dispatch(setPickupDraft({ source: 'cart', items: selectedItems }));
-    dispatch(removeFromCart(selectedItems.map((item) => item.id)));
     go('formPickup');
   };
 

@@ -86,7 +86,7 @@ const userSlice = createSlice({
     },
 
     setProfile: (state, action) => {
-      const { name, phone, email, username, profilePhoto, tanggalLahir, jenisKelamin } = action.payload;
+      const { name, phone, email, username, profilePhoto, tanggalLahir, jenisKelamin, ewalletAccount } = action.payload;
       if (name?.trim()) state.name = name.trim();
       if (username?.trim()) state.username = username.trim();
       if (phone) state.phone = phone;
@@ -94,6 +94,8 @@ const userSlice = createSlice({
       if (email?.trim()) state.email = email.trim().toLowerCase();
       if (tanggalLahir) state.tanggalLahir = tanggalLahir;
       if (jenisKelamin) state.jenisKelamin = jenisKelamin;
+      // Support saving a pickup address in the profile temporarily via ewalletAccount
+      if (typeof ewalletAccount === 'string') state.ewalletAccount = ewalletAccount;
       
       if (!state.tanggalBergabung) {
         const opsi = { month: 'long', year: 'numeric' };

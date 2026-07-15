@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAppNavigation } from '../app/useAppNavigation';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { removeFromCart, clearPickupDraft, setProfile } from '../features/user/userSlice';
 
 export default function FormPickup() {
   const { go } = useAppNavigation();
   const userData = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [schedule, setSchedule] = useState('sekarang');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(0);
@@ -179,6 +181,20 @@ export default function FormPickup() {
 
             localStorage.setItem('pickupHistory', JSON.stringify(history));
             localStorage.setItem('activeTrackingId', String(currentId));
+
+            // If pickupDraft originated from the cart, remove those items only when user confirms
+            if (userData && userData.pickupDraft && userData.pickupDraft.source === 'cart') {
+              const idsToRemove = (userData.pickupDraft.items || []).map((it) => it.id).filter(Boolean);
+              if (idsToRemove.length > 0) dispatch(removeFromCart(idsToRemove));
+            }
+
+            // Save edited/confirmed address back to profile storage (ewalletAccount used as temporary field)
+            if (typeof address === 'string' && address.trim()) {
+              dispatch(setProfile({ ewalletAccount: address.trim() }));
+            }
+
+            // Clear the draft now that the order is confirmed
+            dispatch(clearPickupDraft());
 
             go('tracking');
           }}
