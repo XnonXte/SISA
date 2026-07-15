@@ -1,6 +1,6 @@
+// features/user/userSlice.js
 import { createSlice, nanoid } from '@reduxjs/toolkit';
 
-// Clean blank slate — no demo data. All values populated after login/register.
 export const initialState = {
   // Auth
   userId: null,
@@ -14,6 +14,9 @@ export const initialState = {
   email: '',
   phone: '',
   profilePhoto: '',
+  tanggalLahir: '',
+  jenisKelamin: '',
+  tanggalBergabung: '', // Field Baru untuk mencatat waktu registrasi/masuk awal
   wallet: null,
   ewalletAccount: '',
   rewardType: null, // 'ewallet' | 'listrik'
@@ -22,11 +25,11 @@ export const initialState = {
   points: 0,
   milestone: 1000,
 
-  // Scan session — set by Kamera, consumed by HasilScan
-  scanResult: null, // { imageBase64, category, estimatedPoints, confidence, grade, instruction }
+  // Scan session
+  scanResult: null,
 
   // Cart
-  cartItems: [], // { id, category, icon, estimatedPoints, daysInCart }
+  cartItems: [],
 
   // Pickup
   pickupDraft: null,
@@ -37,7 +40,6 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    // Called after successful login API response
     loginSuccess: (state, action) => {
       const {
         userId,
@@ -52,6 +54,9 @@ const userSlice = createSlice({
         rewardType,
         points,
         milestone,
+        tanggalLahir,
+        jenisKelamin,
+        tanggalBergabung,
       } = action.payload;
       state.userId = userId;
       state.accessToken = accessToken ?? token ?? null;
@@ -62,6 +67,17 @@ const userSlice = createSlice({
       state.email = email ?? '';
       state.phone = phone ?? '';
       state.profilePhoto = action.payload.profilePhoto ?? '';
+      state.tanggalLahir = tanggalLahir ?? '';
+      state.jenisKelamin = jenisKelamin ?? '';
+      
+      // Jika dari API tidak ada tanggalBergabung, otomatis set bulan & tahun saat ini
+      if (tanggalBergabung) {
+        state.tanggalBergabung = tanggalBergabung;
+      } else if (!state.tanggalBergabung) {
+        const opsi = { month: 'long', year: 'numeric' };
+        state.tanggalBergabung = new Date().toLocaleDateString('id-ID', opsi);
+      }
+
       state.wallet = wallet ?? null;
       state.ewalletAccount = ewalletAccount ?? '';
       state.rewardType = rewardType ?? null;
@@ -69,17 +85,22 @@ const userSlice = createSlice({
       state.milestone = milestone ?? 1000;
     },
 
-    // Register.jsx — handleSubmit
     setProfile: (state, action) => {
-      const { name, phone, email, username, profilePhoto } = action.payload;
+      const { name, phone, email, username, profilePhoto, tanggalLahir, jenisKelamin } = action.payload;
       if (name?.trim()) state.name = name.trim();
       if (username?.trim()) state.username = username.trim();
       if (phone) state.phone = phone;
       if (profilePhoto) state.profilePhoto = profilePhoto;
       if (email?.trim()) state.email = email.trim().toLowerCase();
+      if (tanggalLahir) state.tanggalLahir = tanggalLahir;
+      if (jenisKelamin) state.jenisKelamin = jenisKelamin;
+      
+      if (!state.tanggalBergabung) {
+        const opsi = { month: 'long', year: 'numeric' };
+        state.tanggalBergabung = new Date().toLocaleDateString('id-ID', opsi);
+      }
     },
 
-    // RewardPref.jsx — handleConfirm
     setRewardPref: (state, action) => {
       const { rewardType, wallet, ewalletAccount } = action.payload;
       state.rewardType = rewardType;
@@ -87,9 +108,7 @@ const userSlice = createSlice({
       state.ewalletAccount = rewardType === 'ewallet' ? ewalletAccount : null;
     },
 
-    // Kamera.jsx — stores the full API scan response for HasilScan to read
     setScanResult: (state, action) => {
-      // action.payload = { imageBase64, category, estimatedPoints, confidence, grade, instruction }
       state.scanResult = action.payload;
     },
 
@@ -97,7 +116,6 @@ const userSlice = createSlice({
       state.scanResult = null;
     },
 
-    // HasilScan.jsx — addToCart
     addToCart: {
       reducer: (state, action) => {
         state.cartItems.push(action.payload);
@@ -118,36 +136,31 @@ const userSlice = createSlice({
       }),
     },
 
-    // Keranjang.jsx — after requesting pickup for selected items
     removeFromCart: (state, action) => {
-      const ids = action.payload; // string[]
+      const ids = action.payload;
       state.cartItems = state.cartItems.filter((item) => !ids.includes(item.id));
     },
 
-    // HasilScan.jsx / Keranjang.jsx — stage items for FormPickup
     setPickupDraft: (state, action) => {
-      state.pickupDraft = action.payload; // { source, items }
+      state.pickupDraft = action.payload;
     },
 
     clearPickupDraft: (state) => {
       state.pickupDraft = null;
     },
 
-    // Konfirmasi.jsx — Tukar Sekarang
     redeemPoints: (state, action) => {
       state.points = Math.max(state.points - action.payload, 0);
     },
 
-    // Credited when a pickup completes on the backend
     addPoints: (state, action) => {
       state.points += action.payload;
     },
 
-    setPickupHistory:(state,action)=>{
-      state.pickupHistory=action.payload;
+    setPickupHistory: (state, action) => {
+      state.pickupHistory = action.payload;
     },
 
-    // Logout — wipe everything back to blank slate
     logout: () => initialState,
   },
 });

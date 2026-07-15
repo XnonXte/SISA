@@ -9,6 +9,7 @@ const STORAGE_KEY = 'sisa_session';
  * Persist only the auth + profile fields that survive a page reload.
  * Cart, scan result, and pickup draft are session-only — deliberately excluded.
  */
+// store.js (Potongan fungsi saveSession)
 function saveSession(userState) {
   try {
     const session = {
@@ -21,6 +22,9 @@ function saveSession(userState) {
       email: userState.email,
       phone: userState.phone,
       profilePhoto: userState.profilePhoto,
+      tanggalLahir: userState.tanggalLahir,
+      jenisKelamin: userState.jenisKelamin,
+      tanggalBergabung: userState.tanggalBergabung, // Ikut disimpan
       wallet: userState.wallet,
       ewalletAccount: userState.ewalletAccount,
       rewardType: userState.rewardType,
@@ -29,7 +33,7 @@ function saveSession(userState) {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   } catch {
-    // Storage quota exceeded or private browsing — fail silently
+    // Fail silently
   }
 }
 

@@ -19,6 +19,9 @@ import Profil from './screens/Profil';
 import Keranjang from './screens/Keranjang';
 import PusatBantuan from './screens/PusatBantuan';
 import TentangSisa from './screens/TentangSisa';
+import EditProfil from './screens/EditProfil';
+import AlamatPickupPage from './screens/AlamatPickupPage';
+import EscrowInfo from './screens/EscrowInfo';
 
 const SCREENS = {
   splash: Splash,
@@ -37,6 +40,9 @@ const SCREENS = {
   konfirmasi: Konfirmasi,
   profil: Profil,
   keranjang: Keranjang,
+  editProfil: EditProfil,
+  alamatPickup: AlamatPickupPage,
+  keamanan: EscrowInfo,
   pusatBantuan: PusatBantuan,
   tentangSisa: TentangSisa,
 };

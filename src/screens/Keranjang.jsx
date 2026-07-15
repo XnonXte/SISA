@@ -100,9 +100,11 @@ export default function Keranjang() {
         {cartItems.length === 0 ? (
           /* TAMPILAN JIKA KERANJANG KOSONG */
           <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
-            <div className="w-24 h-24 rounded-geo-xl bg-surface border border-line flex items-center justify-center mb-5">
-              <i className="bi bi-basket2 text-4xl text-placeholder" />
-            </div>
+              <img 
+                src="/assets/Asset 10.png" 
+                alt="Keranjang Kosong" 
+                className="h-28 w-28 object-contain sm:h-36 sm:w-36" 
+              />
             <h3 className="text-base font-extrabold text-ink">Keranjang Kamu Masih Kosong</h3>
             <p className="text-[13px] text-placeholder mt-1.5 leading-relaxed">
               Mulai kumpulkan dan lakukan pemindaian botol PET atau kardus bekas pertamamu!
@@ -114,7 +116,7 @@ export default function Keranjang() {
         ) : (
           /* TAMPILAN JIKA KERANJANG TERISI */
           <>
-            {/* PROGRESS PICKUP CARD (Menggunakan token rounded-geo-md agar senada) */}
+            {/* PROGRESS PICKUP CARD */}
             <section className="bg-white border border-line rounded-geo-md p-4 shadow-sm flex flex-col gap-3">
               <div className="flex justify-between items-center">
                 <span className="text-[13px] font-extrabold text-ink">Progress Pickup ({selectedItems.length} Terpilih)</span>
@@ -150,7 +152,7 @@ export default function Keranjang() {
             {/* LIST DAFTAR SAMPAH */}
             <section className="flex flex-col gap-2.5">
 
-              {/* HEADER SUB-BAR DENGAN TOMBOL BULK ERASE DI SEBELAH KANAN TEKS */}
+              {/* HEADER SUB-BAR DENGAN TOMBOL BULK ERASE */}
               <div className="flex items-center justify-between w-full">
                 <h3 className="text-[12px] text-placeholder font-bold uppercase tracking-wide">
                   Daftar Sampah ({cartItems.length})
@@ -171,7 +173,7 @@ export default function Keranjang() {
                   const isChecked = !!checkedItems[item.id];
 
                   return (
-                    /* CARD BOX ITEM - DISAMAKAN KE CORNER BUTTON (rounded-geo-md) */
+                    /* CARD BOX ITEM */
                     <div
                       key={item.id}
                       className={`bg-white border rounded-geo-md p-4 flex gap-3 relative transition-all hover:shadow-sm
@@ -190,7 +192,6 @@ export default function Keranjang() {
 
                       {/* Konten Utama Card */}
                       <div className="flex-1 flex flex-col gap-3">
-                        {/* Header Item Row */}
                         <div className="flex justify-between items-start">
                           <label htmlFor={`check-${item.id}`} className="cursor-pointer">
                             <h4 className="text-[14px] font-extrabold text-ink">{item.name || item.category}</h4>
@@ -254,7 +255,7 @@ export default function Keranjang() {
               </div>
             </section>
 
-            {/* FOOTER CALLOUT INFO (Menggunakan token rounded-geo-md) */}
+            {/* FOOTER CALLOUT INFO */}
             <div className="flex items-start gap-2.5 p-3.5 bg-[#F4F6F8] border border-line rounded-geo-md">
               <i className="bi bi-info-circle text-[#0064FA] text-base shrink-0 mt-0.5" />
               <p className="text-[11px] text-placeholder font-medium leading-relaxed">
@@ -262,7 +263,7 @@ export default function Keranjang() {
               </p>
             </div>
 
-            {/* TOMBOL REQUEST PICKUP: TENGAH, DIPERPANJANG FULL WIDTH */}
+            {/* TOMBOL REQUEST PICKUP */}
             <div className="mt-3 flex justify-center w-full">
               <button
                 onClick={handleRequestPickup}

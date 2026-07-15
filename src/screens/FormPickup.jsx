@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppNavigation } from '../app/useAppNavigation';
+import { useSelector } from 'react-redux';
 
 export default function FormPickup() {
   const { go } = useAppNavigation();
+  const userData = useSelector((state) => state.user);
   const [schedule, setSchedule] = useState('sekarang');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(0);
@@ -81,6 +83,13 @@ export default function FormPickup() {
       }
     );
   };
+
+  // Prefill address from saved profile field (ewalletAccount used as temporary storage)
+  useEffect(() => {
+    if (userData && userData.ewalletAccount) {
+      setAddress(userData.ewalletAccount);
+    }
+  }, [userData && userData.ewalletAccount]);
 
   return (
     <div className="flex flex-col h-screen bg-surface relative">
