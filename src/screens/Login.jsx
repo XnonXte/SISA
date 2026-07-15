@@ -13,6 +13,7 @@ const GUEST_USER = {
     name: 'Guest',
     username: 'guest',
     phone: '+628123456789',
+    email: 'guest@email.com',
     points: 0,
     milestone: 1000,
 };
@@ -84,6 +85,9 @@ export default function Login() {
     };
 
     const handleGuestLogin = () => {
+        // Prefill the email field for guest and include it in the login payload
+        setEmail(GUEST_USER.email || 'guest@email.com');
+        setPassword('');
         dispatch(loginSuccess(GUEST_USER));
         go('dashboard');
     };
