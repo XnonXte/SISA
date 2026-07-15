@@ -10,8 +10,8 @@ export default function AlamatPickupPage() {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
 
-  // Menggunakan ewalletAccount / field sementara untuk menyimpan alamat penjemputan utama
-  const [address, setAddress] = useState(userData.ewalletAccount || '');
+  // Menggunakan pickupAddress sebagai penyimpanan alamat penjemputan utama
+  const [address, setAddress] = useState(userData.pickupAddress || '');
   const [locating, setLocating] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -53,7 +53,7 @@ export default function AlamatPickupPage() {
   };
 
   const handleSave = () => {
-    dispatch(setProfile({ ewalletAccount: address }));
+    dispatch(setProfile({ pickupAddress: address }));
     setSavedSuccess(true);
     setTimeout(() => {
       go('profil');

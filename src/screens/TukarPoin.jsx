@@ -15,18 +15,27 @@ const methods = [
 
 export default function TukarPoin() {
   const { go } = useAppNavigation();
-  const points = useSelector((state) => state.user.points) || 0;
+  const userData = useSelector((state) => state.user);
+  const points = userData.points || 0;
+  const rewardPhone = userData.rewardPhone || userData.ewalletAccount || '';
 
   // State untuk kontrol pop-up gagal
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showMissingPhoneModal, setShowMissingPhoneModal] = useState(false);
 
   // Fungsi validasi klik metode
   const handleMethodClick = () => {
     if (points < MIN_POINTS) {
       setShowErrorModal(true);
-    } else {
-      go('konfirmasi');
+      return;
     }
+
+    if (!rewardPhone.trim()) {
+      setShowMissingPhoneModal(true);
+      return;
+    }
+
+    go('konfirmasi');
   };
 
   return (
@@ -98,6 +107,31 @@ export default function TukarPoin() {
           </div>
         </div>
       )}
+
+        {/* Pop-up Gagal (Reward Phone Belum Diset) */}
+        {showMissingPhoneModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+            <div className="bg-white rounded-2xl p-8 w-80 text-center animate-pop-in mx-4">
+              <div className="mb-4">
+                <i className="bi bi-exclamation-circle-fill text-yellow-500" style={{ fontSize: 56 }} />
+              </div>
+              <div className="text-[20px] font-extrabold text-ink">Reward Phone Belum Diset</div>
+              <div className="text-sm text-placeholder mt-2">
+                Silakan atur nomor reward e-wallet yang berbeda dari nomor login pada halaman Profil sebelum melakukan penukaran.
+              </div>
+
+              <button
+                className="btn-primary mt-6 w-full"
+                onClick={() => {
+                  setShowMissingPhoneModal(false);
+                  go('rewardPref');
+                }}
+              >
+                Atur Nomor Reward
+              </button>
+            </div>
+          </div>
+        )}
     </div>
   );
 }

@@ -13,12 +13,14 @@ export const initialState = {
   username: '',
   email: '',
   phone: '',
+  rewardPhone: '',
   profilePhoto: '',
   tanggalLahir: '',
   jenisKelamin: '',
   tanggalBergabung: '', // Field Baru untuk mencatat waktu registrasi/masuk awal
   wallet: null,
   ewalletAccount: '',
+  pickupAddress: '',
   rewardType: null, // 'ewallet' | 'listrik'
 
   // Points
@@ -66,6 +68,8 @@ const userSlice = createSlice({
       state.username = action.payload.username ?? '';
       state.email = email ?? '';
       state.phone = phone ?? '';
+      state.rewardPhone = action.payload.rewardPhone ?? '';
+      state.pickupAddress = action.payload.pickupAddress ?? '';
       state.profilePhoto = action.payload.profilePhoto ?? '';
       state.tanggalLahir = tanggalLahir ?? '';
       state.jenisKelamin = jenisKelamin ?? '';
@@ -86,7 +90,7 @@ const userSlice = createSlice({
     },
 
     setProfile: (state, action) => {
-      const { name, phone, email, username, profilePhoto, tanggalLahir, jenisKelamin, ewalletAccount } = action.payload;
+      const { name, phone, email, username, profilePhoto, tanggalLahir, jenisKelamin, rewardPhone, pickupAddress } = action.payload;
       if (name?.trim()) state.name = name.trim();
       if (username?.trim()) state.username = username.trim();
       if (phone) state.phone = phone;
@@ -94,8 +98,8 @@ const userSlice = createSlice({
       if (email?.trim()) state.email = email.trim().toLowerCase();
       if (tanggalLahir) state.tanggalLahir = tanggalLahir;
       if (jenisKelamin) state.jenisKelamin = jenisKelamin;
-      // Support saving a pickup address in the profile temporarily via ewalletAccount
-      if (typeof ewalletAccount === 'string') state.ewalletAccount = ewalletAccount;
+      if (typeof rewardPhone === 'string') state.rewardPhone = rewardPhone;
+      if (typeof pickupAddress === 'string') state.pickupAddress = pickupAddress;
       
       if (!state.tanggalBergabung) {
         const opsi = { month: 'long', year: 'numeric' };
@@ -104,10 +108,12 @@ const userSlice = createSlice({
     },
 
     setRewardPref: (state, action) => {
-      const { rewardType, wallet, ewalletAccount } = action.payload;
+      const { rewardType, wallet, rewardPhone, ewalletAccount } = action.payload;
+      const finalRewardPhone = rewardPhone ?? ewalletAccount ?? '';
       state.rewardType = rewardType;
       state.wallet = rewardType === 'ewallet' ? wallet : null;
-      state.ewalletAccount = rewardType === 'ewallet' ? ewalletAccount : null;
+      state.rewardPhone = rewardType === 'ewallet' ? finalRewardPhone : '';
+      state.ewalletAccount = rewardType === 'ewallet' ? finalRewardPhone : null;
     },
 
     setScanResult: (state, action) => {

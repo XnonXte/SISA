@@ -303,7 +303,7 @@ export function apiUpdateProfile({ email, name, username, phone, profilePhoto })
     username: username ?? user.username,
     phone: phone ?? user.phone,
     profilePhoto: profilePhoto ?? user.profilePhoto,
-    ewalletAccount: phone ?? user.ewalletAccount,
+    ewalletAccount: user.ewalletAccount,
   };
 
   // Save by email key

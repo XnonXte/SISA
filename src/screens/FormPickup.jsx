@@ -119,12 +119,12 @@ export default function FormPickup() {
     );
   };
 
-  // Prefill address from saved profile field (ewalletAccount used as temporary storage)
+  // Prefill address from saved profile field (pickupAddress is the correct field now)
   useEffect(() => {
-    if (userData && userData.ewalletAccount) {
-      setAddress(userData.ewalletAccount);
+    if (userData && userData.pickupAddress) {
+      setAddress(userData.pickupAddress);
     }
-  }, [userData && userData.ewalletAccount]);
+  }, [userData && userData.pickupAddress]);
 
   return (
     <div className="flex flex-col h-screen bg-surface relative">
@@ -217,9 +217,9 @@ export default function FormPickup() {
               if (idsToRemove.length > 0) dispatch(removeFromCart(idsToRemove));
             }
 
-            // Save edited/confirmed address back to profile storage (ewalletAccount used as temporary field)
+            // Save edited/confirmed address back to profile storage
             if (typeof address === 'string' && address.trim()) {
-              dispatch(setProfile({ ewalletAccount: address.trim() }));
+              dispatch(setProfile({ pickupAddress: address.trim() }));
             }
 
             // Clear the draft now that the order is confirmed

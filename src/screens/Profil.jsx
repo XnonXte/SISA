@@ -25,18 +25,20 @@ export default function Profil() {
     profilePhoto, 
     wallet, 
     rewardType, 
-    ewalletAccount, 
+    rewardPhone,
+    ewalletAccount,
     points, 
     token,
     tanggalBergabung 
   } = userData;
 
-  const isEwallet = rewardType !== 'listrik';
+  const isEwallet = rewardType === 'ewallet';
   const rewardIcon = isEwallet ? 'bi-wallet2' : 'bi-lightning-charge';
   const rewardTitle = isEwallet ? (wallet || 'E-Wallet') : 'Token Listrik';
-  const maskedAccount = isEwallet ? maskAccount(ewalletAccount) : null;
+  const rewardAccount = isEwallet ? (rewardPhone || ewalletAccount || '') : '';
+  const maskedAccount = isEwallet ? maskAccount(rewardAccount) : null;
   const rewardSub = isEwallet
-    ? (maskedAccount || 'Nomor akun belum diatur')
+    ? (maskedAccount || 'Nomor reward belum diatur')
     : 'Token Meteran Listrik';
 
   // Mengambil tanggal bergabung dinamis dari localStorage/Redux, dengan fallback otomatis ke bulan berjalan jika kosong

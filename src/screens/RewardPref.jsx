@@ -17,7 +17,7 @@ export default function RewardPref() {
 
   const [selected, setSelected] = useState(userData.rewardType || 'ewallet');
   const [wallet, setWallet] = useState(userData.wallet || 'GoPay');
-  const [account, setAccount] = useState(userData.ewalletAccount || '');
+  const [account, setAccount] = useState(userData.rewardPhone || '');
 
   const options = [
     { id: 'ewallet', title: 'E-Wallet', sub: 'GoPay, OVO, DANA', icon: 'bi bi-wallet2' },
@@ -25,14 +25,17 @@ export default function RewardPref() {
   ];
 
   const isEwallet = selected === 'ewallet';
-  const canConfirm = isEwallet ? account.trim().length >= 6 : true;
+  const trimmedAccount = account.trim();
+  const isSameAsLogin = isEwallet && trimmedAccount && trimmedAccount === (userData.phone || '');
+  const canConfirm = isEwallet ? trimmedAccount.length >= 6 && !isSameAsLogin : true;
 
   const handleConfirm = () => {
     if (!canConfirm) return;
     dispatch(setRewardPref({
       rewardType: selected,
       wallet: isEwallet ? wallet : null,
-      ewalletAccount: isEwallet ? account.trim() : null,
+      rewardPhone: isEwallet ? trimmedAccount : null,
+      ewalletAccount: isEwallet ? trimmedAccount : null,
     }));
     go('dashboard');
   };
@@ -99,14 +102,22 @@ export default function RewardPref() {
               })}
             </div>
 
-            <div className="text-xs text-placeholder font-medium mb-1">Nomor Akun {wallet}</div>
+            <div className="text-xs text-placeholder font-medium mb-1">Reward Phone untuk {wallet}</div>
             <input
               type="tel"
-              placeholder="812-3456-7890"
+              placeholder="+628123456789"
               value={account}
               onChange={(e) => setAccount(e.target.value)}
               className="input-field"
             />
+            <div className="text-[11px] text-placeholder mt-2">
+              Gunakan nomor reward yang berbeda dari nomor login.
+            </div>
+            {isSameAsLogin && (
+              <div className="mt-2 text-[11px] text-danger font-semibold">
+                Nomor reward tidak boleh sama dengan nomor login.
+              </div>
+            )}
           </div>
         )}
 

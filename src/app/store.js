@@ -21,6 +21,8 @@ function saveSession(userState) {
       username: userState.username,
       email: userState.email,
       phone: userState.phone,
+      rewardPhone: userState.rewardPhone,
+      pickupAddress: userState.pickupAddress,
       profilePhoto: userState.profilePhoto,
       tanggalLahir: userState.tanggalLahir,
       jenisKelamin: userState.jenisKelamin,
