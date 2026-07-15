@@ -331,7 +331,7 @@ const MATERIAL_DB = {
     subtype: 'Botol PET',
     icon: 'bi-recycle',
     recycleCategory: 'Daur Ulang',
-    prices: { 'Grade A': 2500, 'Grade B': 2000 },
+    prices: { 'Grade A': 6000, 'Grade B': 5000 },
     recommendation: 'Lepaskan tutup dan label botol agar peluang mendapatkan Grade A lebih tinggi.',
   },
   Cardboard: {
@@ -339,7 +339,7 @@ const MATERIAL_DB = {
     subtype: 'Kardus Bekas',
     icon: 'bi-box-seam',
     recycleCategory: 'Daur Ulang',
-    prices: { 'Grade A': 1500, 'Grade B': 1000 },
+    prices: { 'Grade A': 3500, 'Grade B': 2500 },
     recommendation: 'Pastikan kardus kering dan tidak basah agar tetap Grade A.',
   },
 };

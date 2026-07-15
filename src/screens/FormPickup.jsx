@@ -1,7 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useAppNavigation } from '../app/useAppNavigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart, clearPickupDraft, setProfile } from '../features/user/userSlice';
+import { removeFromCart, clearPickupDraft, setProfile, setPickupHistory } from '../features/user/userSlice';
+
+function buildPickupHistoryEntries({ draftItems, schedule, slots, selectedSlot, address }) {
+  const entries = Array.isArray(draftItems) && draftItems.length > 0
+    ? draftItems.map((item, idx) => ({
+        id: Date.now() + idx,
+        name: item.name || item.category || 'Material',
+        date: new Date().toLocaleString('id-ID'),
+        status: schedule === 'sekarang' ? 'DALAM_PROSES' : 'DIJADWALKAN',
+        estimatedPoints: Number(item.estimatedPoints) || 0,
+        verifiedPoints: Number(item.estimatedPoints) || 0,
+        grade: item.grade || '-',
+        material: item.category || '-',
+        address,
+        source: 'cart',
+        startTime: Date.now(),
+        pointsAdded: false,
+      }))
+    : [{
+        id: Date.now(),
+        name: schedule === 'sekarang' ? 'Penjemputan Instan' : `Jadwal (${slots[selectedSlot].name})`,
+        date: new Date().toLocaleString('id-ID'),
+        status: schedule === 'sekarang' ? 'DALAM_PROSES' : 'DIJADWALKAN',
+        estimatedPoints: 0,
+        verifiedPoints: 0,
+        grade: '-',
+        material: '-',
+        address,
+        startTime: Date.now(),
+        pointsAdded: false,
+      }];
+
+  return entries;
+}
 
 export default function FormPickup() {
   const { go } = useAppNavigation();
@@ -164,23 +197,19 @@ export default function FormPickup() {
           className="btn-primary"
           onClick={() => {
             const history = JSON.parse(localStorage.getItem('pickupHistory') || '[]');
-
-            // Generate ID unik untuk referensi pelacakan di Tracking.jsx
-            const currentId = Date.now();
-
-            history.unshift({
-              id: currentId,
-              name: schedule === 'sekarang' ? 'Penjemputan Instan' : `Jadwal (${slots[selectedSlot].name})`,
-              date: new Date().toLocaleString('id-ID'),
-              status: schedule === 'sekarang' ? 'DALAM_PROSES' : 'DIJADWALKAN',
-              estimatedPoints: (JSON.parse(localStorage.getItem('lastScan') || '{}').estimatedPoints || 0),
-              grade: (JSON.parse(localStorage.getItem('lastScan') || '{}').grade || '-'),
-              material: (JSON.parse(localStorage.getItem('lastScan') || '{}').category || '-'),
-              address
+            const draftItems = userData?.pickupDraft?.items || [];
+            const historyEntries = buildPickupHistoryEntries({
+              draftItems,
+              schedule,
+              slots,
+              selectedSlot,
+              address,
             });
+            const nextHistory = [...historyEntries, ...history];
 
-            localStorage.setItem('pickupHistory', JSON.stringify(history));
-            localStorage.setItem('activeTrackingId', String(currentId));
+            localStorage.setItem('pickupHistory', JSON.stringify(nextHistory));
+            dispatch(setPickupHistory(nextHistory));
+            localStorage.setItem('activeTrackingId', String(historyEntries[0]?.id ?? Date.now()));
 
             // If pickupDraft originated from the cart, remove those items only when user confirms
             if (userData && userData.pickupDraft && userData.pickupDraft.source === 'cart') {

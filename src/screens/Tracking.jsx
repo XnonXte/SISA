@@ -8,10 +8,26 @@ export default function Tracking() {
   const dispatch = useDispatch();
 
   const draft = useSelector(s => s.user.pickupDraft);
-  const history = useSelector(s => s.user.pickupHistory) || JSON.parse(localStorage.getItem('pickupHistory') || '[]');
+  const historyFromRedux = useSelector(s => s.user.pickupHistory);
+  const history = historyFromRedux?.length
+    ? historyFromRedux
+    : JSON.parse(localStorage.getItem('pickupHistory') || '[]');
 
   // State trigger untuk re-render hitungan waktu setiap detik
   const [tick, setTick] = useState(0);
+
+  // State untuk data simulasi palsu (selalu fresh menggunakan Date.now() saat komponen di-mount)
+  const [fakeItem, setFakeItem] = useState(() => ({
+    id: 'fake-simulation',
+    status: 'DALAM_PROSES',
+    name: 'Sampah Rumah Tangga (Simulasi)',
+    estimatedPoints: 150,
+    verifiedPoints: 150,
+    date: new Date().toLocaleString('id-ID'),
+    startTime: Date.now(),
+    pointsAdded: false,
+    count: 1
+  }));
 
   // 1. LOGIKA SAAT CHECKOUT BARU
   useEffect(() => {
@@ -37,8 +53,10 @@ export default function Tracking() {
     }
   }, [draft, history, dispatch]);
 
+  // PERBAIKAN: Hanya gunakan realItem jika ID pelacakan aktif benar-benar ditemukan & valid
   const activeId = localStorage.getItem('activeTrackingId');
-  const currentItem = history.find(item => String(item.id) === String(activeId)) || history[0];
+  const realItem = history.find(item => String(item.id) === String(activeId));
+  const currentItem = realItem || fakeItem;
 
   // 2. HITUNG PROGRESS BERDASARKAN TIMESTAMP
   const elapsed = currentItem && currentItem.status === 'DALAM_PROSES'
@@ -55,6 +73,16 @@ export default function Tracking() {
   // 3. LOGIKA SELESAI OTOMATIS (15 DETIK)
   useEffect(() => {
     if (currentItem && currentItem.status === 'DALAM_PROSES' && elapsed >= 15000) {
+      // Jika yang selesai adalah item simulasi
+      if (currentItem.id === 'fake-simulation') {
+        if (!currentItem.pointsAdded) {
+          dispatch(addPoints(currentItem.estimatedPoints || 0));
+          setFakeItem(prev => ({ ...prev, status: 'SELESAI', pointsAdded: true }));
+        }
+        return;
+      }
+
+      // Jika yang selesai adalah item asli dari checkout
       const currentHistory = JSON.parse(localStorage.getItem('pickupHistory') || '[]');
       const nextHistory = currentHistory.map(item => {
         if (String(item.id) === String(currentItem.id)) {
@@ -68,12 +96,11 @@ export default function Tracking() {
 
       localStorage.setItem('pickupHistory', JSON.stringify(nextHistory));
       dispatch(setPickupHistory(nextHistory));
+      
+      // PERBAIKAN: Hapus ID aktif agar kunjungan berikutnya kembali memicu simulasi baru
+      localStorage.removeItem('activeTrackingId');
     }
   }, [elapsed, currentItem, dispatch]);
-
-  if (!currentItem) {
-    return <div className="flex items-center justify-center h-screen bg-surface-alt text-muted">Memuat data tracking...</div>;
-  }
 
   // 4. PENENTUAN TAHAPAN DAN KONFIGURASI KONTEN UTAMA
   let activeStepIndex = 0;
@@ -98,13 +125,12 @@ export default function Tracking() {
     currentSubTitle = "Mitra sedang mengambil sampah Anda";
   }
 
-  // Pemetaan Ikon Besar & Animasi berdasarkan tahapan aktif saat ini
   const illustrationMap = {
-    0: { icon: 'bi-clipboard-check-fill', animation: 'animate-pulse' }, // Dikonfirmasi
-    1: { icon: 'bi-truck', animation: 'animate-drive' },                // Dijemput
-    2: { icon: 'bi-speedometer', animation: 'animate-pulse' },          // Ditimbang
-    3: { icon: 'bi-cash-coin', animation: 'animate-bounce' },           // Poin Masuk
-    4: { icon: 'bi-check-circle-fill', animation: 'scale-110' },        // Selesai
+    0: { icon: 'bi-clipboard-check-fill', animation: 'animate-pulse' },
+    1: { icon: 'bi-truck', animation: 'animate-drive' },
+    2: { icon: 'bi-speedometer', animation: 'animate-pulse' },
+    3: { icon: 'bi-cash-coin', animation: 'animate-bounce' },
+    4: { icon: 'bi-check-circle-fill', animation: 'scale-110' },
   };
 
   const currentIllustration = illustrationMap[activeStepIndex];
@@ -140,16 +166,14 @@ export default function Tracking() {
       </div>
 
       <div className="flex-1 px-5 flex flex-col items-center overflow-y-auto">
-        {/* Mitra Illustration Box (Ikon Dinamis Berubah Di Sini) */}
+        {/* Mitra Illustration Box */}
         <div className="w-full h-[200px] mt-8 flex items-center justify-center shrink-0">
           <div className="w-[180px] h-[180px] rounded-full bg-gradient-to-br from-primary-tint to-[#F1F8E9] flex items-center justify-center relative shadow-sm">
-
-            {/* Menggunakan ikon dinamis dan kelas animasi dinamis */}
+            
             <div className={`transition-all duration-500 ${currentIllustration.animation}`}>
               <i className={`bi ${currentIllustration.icon} text-primary`} style={{ fontSize: 64 }} />
             </div>
 
-            {/* Efek hiasan dekoratif GPS hanya muncul saat proses penjemputan awal */}
             {activeStepIndex === 1 && (
               <>
                 <div className="absolute bottom-5 -left-7 flex gap-1.5">
@@ -172,7 +196,7 @@ export default function Tracking() {
           {progressPercent >= 100 ? 'Proses Selesai' : `Waktu Berjalan: ${Math.floor(progressPercent)}%`}
         </div>
 
-        {/* Progress Tracker Horizontal Indikator */}
+        {/* Progress Tracker */}
         <div className="flex w-full items-center mt-10 px-2">
           {steps.map((step, i) => (
             <React.Fragment key={step.label}>

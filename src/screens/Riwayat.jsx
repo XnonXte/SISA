@@ -42,9 +42,11 @@ function formatRiwayatDate(dateStr) {
 }
 
 function PointsLabel({ item }) {
+  const resolvedPoints = Math.max(0, Number(item?.verifiedPoints ?? item?.estimatedPoints ?? 0));
+
   if (item.status === 'DIBATALKAN') return <span className="text-placeholder">+0 PT</span>;
-  if (item.status === 'SELESAI') return <span className="text-primary">+{item.verifiedPoints || item.estimatedPoints || 100} PT</span>;
-  return <span className="text-accent">~{item.estimatedPoints || 100} PT</span>;
+  if (item.status === 'SELESAI') return <span className="text-primary">+{resolvedPoints} PT</span>;
+  return <span className="text-accent">~{resolvedPoints} PT</span>;
 }
 
 function EmptyState({ go }) {
@@ -73,7 +75,23 @@ export default function Riwayat() {
   const [expandedIdx, setExpandedIdx] = useState(null);
 
   const historyFromRedux = useSelector(s => s.user.pickupHistory);
-  const items = historyFromRedux || JSON.parse(localStorage.getItem('pickupHistory') || '[]');
+  const items = historyFromRedux?.length
+    ? historyFromRedux
+    : JSON.parse(localStorage.getItem('pickupHistory') || '[]');
+
+  useEffect(() => {
+    const localHistory = JSON.parse(localStorage.getItem('pickupHistory') || '[]');
+    if (!Array.isArray(localHistory) || localHistory.length === 0) return;
+
+    const reduxHistory = Array.isArray(historyFromRedux) ? historyFromRedux : [];
+    const isDifferent =
+      reduxHistory.length !== localHistory.length ||
+      JSON.stringify(reduxHistory) !== JSON.stringify(localHistory);
+
+    if (isDifferent) {
+      dispatch(setPickupHistory(localHistory));
+    }
+  }, [dispatch, historyFromRedux]);
 
   // LOGIKA BACKGROUND PROGRESS TICKER
   useEffect(() => {

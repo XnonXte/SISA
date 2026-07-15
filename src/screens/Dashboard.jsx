@@ -1,6 +1,7 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAppNavigation } from '../app/useAppNavigation';
+import { setPickupHistory } from '../features/user/userSlice';
 import BottomNav from '../components/BottomNav';
 import TopBoard from '../components/TopBoard';
 
@@ -75,11 +76,24 @@ function getHistoryStatus(item) {
 
 export default function Dashboard() {
   const { go } = useAppNavigation();
-  const { name, profilePhoto, points, milestone, cartItems, pickupHistory } = useSelector((state) => state.user);
+  const { name, profilePhoto, points, cartItems, pickupHistory } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const localHistory = JSON.parse(localStorage.getItem('pickupHistory') || '[]');
+    if (!Array.isArray(localHistory) || localHistory.length === 0) return;
+
+    const reduxHistory = Array.isArray(pickupHistory) ? pickupHistory : [];
+    const isDifferent =
+      reduxHistory.length !== localHistory.length ||
+      JSON.stringify(reduxHistory) !== JSON.stringify(localHistory);
+
+    if (isDifferent) {
+      dispatch(setPickupHistory(localHistory));
+    }
+  }, [dispatch, pickupHistory]);
 
   const firstName = name?.split(' ')[0] ?? 'Customer';
-  const progress = milestone > 0 ? Math.min((points / milestone) * 100, 100) : 0;
-  const remaining = Math.max(milestone - points, 0);
   const totalValueIdr = points * 10;
   const cartTotalPoints = (cartItems ?? []).reduce((sum, item) => sum + (item.estimatedPoints || 0), 0);
   const cartTotalWeight = (cartItems ?? []).reduce((sum, item) => sum + estimateItemWeightKg(item), 0);
@@ -90,7 +104,7 @@ export default function Dashboard() {
   const activePickup = historyItems.find((item) => item?.status === 'DALAM_PROSES' || item?.status === 'DIJADWALKAN') || null;
   const pendingPoints = historyItems
     .filter((item) => item?.status === 'DALAM_PROSES' || item?.status === 'DIJADWALKAN')
-    .reduce((sum, item) => sum + (item.estimatedPoints || 0), 0);
+    .reduce((sum, item) => sum + Math.max(0, Number(item?.estimatedPoints ?? 0)), 0);
 
   const quickActions = [
     { label: 'Scan Sampah', icon: 'bi-camera', action: 'kamera', description: 'Pindai & simpan' },
@@ -144,13 +158,15 @@ export default function Dashboard() {
         <div className="mx-auto w-full max-w-7xl px-4 py-4 pb-[112px] sm:px-6 lg:px-8">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.95fr)] lg:items-start">
             <section className="space-y-4">
+              {/* KARTU AKUMULASI SALDO */}
               <div className="relative overflow-hidden rounded-geo-2xl border border-line bg-[#FFF8DF] p-4 pl-5 shadow-card sm:p-6 sm:pl-6">
                 <div className="absolute left-0 top-0 h-full w-1.5 bg-accent" />
                 <div className="absolute -right-10 top-0 h-32 w-32 rounded-full bg-primary/10 blur-3xl" />
                 <div className="absolute -left-10 bottom-0 h-28 w-28 rounded-full bg-accent/10 blur-3xl" />
 
-                <div className="relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                  <div className="w-full min-w-0 sm:max-w-[72%]">
+                <div className="relative flex items-center justify-between gap-4">
+                  {/* Bagian Kiri: Info Saldo & Tombol Detail yang Diperbesar */}
+                  <div className="min-w-0 flex-1">
                     <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink sm:text-[11px]">Akumulasi Saldo</div>
                     <div className="mt-1.5 flex flex-wrap items-end gap-1.5 sm:mt-2 sm:gap-2">
                       <div className="text-[34px] font-extrabold leading-none tracking-tight text-ink sm:text-[54px]">
@@ -162,35 +178,22 @@ export default function Dashboard() {
                       Setara dengan IDR {formatPointValue(totalValueIdr)}
                     </div>
 
-                    <div className="mt-3 sm:mt-5">
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-wide text-muted sm:text-[11px]">
-                        <span>Ambang bonus multiplier 2x</span>
-                        <span>{formatPointValue(remaining)} PT lagi</span>
-                      </div>
-                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line/70">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-primary via-[#7FD99A] to-primary transition-[width] duration-1000 ease-out"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:flex-col sm:items-end">
                     <button
                       type="button"
                       onClick={() => go('profil')}
-                      className="rounded-full border border-line bg-white px-3 py-1.5 text-[10px] font-extrabold text-ink shadow-sm transition-transform active:scale-95 whitespace-nowrap sm:text-[11px]"
+                      className="mt-4 rounded-full border border-line bg-white px-5 py-2 text-xs font-extrabold text-ink shadow-sm transition-transform active:scale-95 whitespace-nowrap sm:px-6 sm:py-2.5 sm:text-sm"
                     >
                       Detail Saldo &gt;
                     </button>
-                    <div className="hidden h-24 w-24 items-center justify-center sm:flex sm:h-28 sm:w-28">
-                      <img
-                        src="/assets/Asset%205.png"
-                        alt="Ilustrasi akumulasi saldo"
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
+                  </div>
+
+                  {/* Bagian Kanan: Ilustrasi 2D */}
+                  <div className="flex h-24 w-24 shrink-0 items-center justify-center sm:h-32 sm:w-32">
+                    <img
+                      src="/assets/Asset%205.png"
+                      alt="Ilustrasi akumulasi saldo"
+                      className="h-full w-full object-contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -254,7 +257,9 @@ export default function Dashboard() {
                       </div>
                     ) : (
                       recentLogs.map((item) => {
-                        const displayPoints = item.status === 'DIBATALKAN' ? 0 : (item.verifiedPoints || item.estimatedPoints || 0);
+                        const displayPoints = item.status === 'DIBATALKAN'
+                          ? 0
+                          : Math.max(0, Number(item?.verifiedPoints ?? item?.estimatedPoints ?? 0));
                         return (
                           <div
                             key={item.id || `${item.name}-${item.date}`}

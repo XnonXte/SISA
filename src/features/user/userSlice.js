@@ -156,7 +156,8 @@ const userSlice = createSlice({
     },
 
     addPoints: (state, action) => {
-      state.points += action.payload;
+      const amount = Number(action.payload) || 0;
+      state.points += amount;
     },
 
     setPickupHistory: (state, action) => {
