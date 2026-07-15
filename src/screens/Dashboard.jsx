@@ -103,25 +103,25 @@ export default function Dashboard() {
       title: 'Cara mempersiapkan sampah plastik',
       icon: 'bi-droplet-half',
       accent: 'from-primary/15 to-primary/5',
-      href: 'https://program.sampoernaacademy.sch.id/id/artikel-id/cara-daur-ulang-sampah-plastik-dan-manfaat-bagi-lingkungan/',
+      href: 'https://arahenvironmental.com/bagaimana-cara-daur-ulang-plastik/',
     },
     {
       title: 'Kenali jenis-jenis sampah kertas',
       icon: 'bi-box-seam',
       accent: 'from-accent/20 to-accent/5',
-      href: 'https://www.antaranews.com/berita/5443530/sampah-kertas-di-indonesia-daur-ulang-menjadi-solusi-ramah-lingkungan',
+      href: 'https://kumparan.com/kumparanbisnis/kenali-jenis-sampah-kertas-yang-bisa-disulap-jadi-karya-seni-26t8yPJ7Cjn',
     },
     {
       title: 'Sampah logam juga bisa bernilai!',
       icon: 'bi-nut',
       accent: 'from-[#D7E8F8] to-[#EEF5FF]',
-      href: 'https://www.antaranews.com/berita/4790541/pengertian-daur-ulang-sampah-dan-ragam-manfaatnya',
+      href: 'https://dynatech-int.com/en/mengenal-proses-daur-ulang-logam-dan-hasil-akhirnya/',
     },
     {
       title: 'Dampak positif daur ulang',
       icon: 'bi-recycle',
       accent: 'from-[#DDF5E5] to-[#F4FBF5]',
-      href: 'https://www.antaranews.com/berita/4790541/pengertian-daur-ulang-sampah-dan-ragam-manfaatnya',
+      href: 'https://waste4change.com/blog/manfaat-daur-ulang-plastik-dalam-kehidupan-sehari-hari/',
     },
   ];
 
@@ -286,7 +286,7 @@ export default function Dashboard() {
                         Setiap sampah yang kamu pilah, bumi jadi lebih baik.
                       </div>
                       <a
-                        href="https://kemenlh.go.id/news/detail/bukan-sekadar-daur-ulang-jurus-indonesia-kelola-sampah-plastik-e-waste"
+                        href="https://madanitec.com/article/detail/manfaat-memilah-sampah"
                         target="_blank"
                         rel="noreferrer"
                         className="mt-3 inline-flex items-center rounded-full bg-white px-3.5 py-2 text-[11px] font-extrabold text-primary shadow-sm sm:mt-4 sm:text-[12px]"

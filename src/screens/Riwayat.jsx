@@ -57,10 +57,11 @@ function EmptyState({ go }) {
       />
       <div className="text-base font-extrabold text-ink mt-4">Belum Ada Riwayat</div>
       <div className="text-[13px] text-placeholder mt-1.5 leading-relaxed">
-        Riwayat pickup sampahmu akan muncul di sini setelah kamu melakukan scan pertama.
+        Riwayat pickup sampahmu akan muncul di sini setelah kamu melakukan permohonan penjemputan
       </div>
-      <button className="btn-primary mt-6 w-auto px-6" onClick={() => go('kamera')}>
-        Mulai Scan Sekarang
+      {/* PERBAIKAN: Mengubah teks tombol dan route ke keranjang */}
+      <button className="btn-primary mt-6 w-auto px-6" onClick={() => go('keranjang')}>
+        Cek Keranjang
       </button>
     </div>
   );
